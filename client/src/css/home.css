@@ -1,0 +1,53 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.container{
+    width: 100%;
+    height: 100vh;
+}
+
+/* Assuming you're using Font Awesome for the camera icon */
+.file-label {
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+  }
+  
+  .icon-container {
+    display: inline-block;
+    width: 30px; /* Adjust the width as needed */
+    height: 30px; /* Adjust the height as needed */
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    padding: 5px;
+    text-align: center;
+  }
+  
+  .icon-container i {
+    color: #ccc;
+  }
+  
+  .text {
+    margin-left: 10px; /* Adjust the spacing as needed */
+  }
+  
+  /* Hide the default file input */
+  .hidden {
+    display: none;
+  }
+
+  /* CSS styles from the previous example */
+
+#preview-container {
+    margin-top: 10px; /* Adjust the spacing as needed */
+  }
+  
+  #preview-image {
+    max-width: 300px; /* Adjust the maximum width of the preview image */
+    max-height: 300px; /* Adjust the maximum height of the preview image */
+  }
+  
+  
