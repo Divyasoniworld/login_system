@@ -4,6 +4,7 @@ import { useNavigate ,useLocation, Link} from 'react-router-dom'
 import {BiLogOut} from "react-icons/bi"
 import {IoIosCreate} from "react-icons/io"
 import axios from 'axios';
+import swal from 'sweetalert'
 
 function Header() {
 
@@ -12,7 +13,6 @@ function Header() {
   const location = useLocation();
   const auth = localStorage.getItem('token')
 
-//  const profile = (location.state.profile != null) ? location.state.profile : "default.jpg"
 
 useEffect(() => {
   let config = {
@@ -28,39 +28,52 @@ useEffect(() => {
     
 axios.request(config)
 .then((response) => {
-  // console.log('response',response);
 setUserData(response.data.data)
- 
 })
 .catch((error) => {
   console.log(error);
 });
 }, []);
 
-  useEffect(() => {
-    if (!auth) {          
-      navigate('/login')
-    } 
-  }, [navigate, auth]);
+const handleLogout = () =>{
+    swal({
+      title: "Are you sure to Logout?",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    })
+    .then((willDelete) => {
+      if (willDelete) {
+        localStorage.removeItem('token')
+        navigate('/login')
+      } 
+    });
+}
+
+
+
+
+ if (userData.role == 'user') {
+  var createPostlable = <div style={{cursor:"pointer"}} className="navbar-brand d-flex">
+<Link to={'/post'} style={{textDecoration:"none",color:"black"}}>Create Post <IoIosCreate size={25}/></Link>
+ </div> 
+ }
+  
 
 
   return (
     <>
  <nav className="navbar bg-body-tertiary">
   <div className="container-fluid">
-    <div className="navbar-brand">
+    <div className="navbar-brand d-flex">
       <img src= {userData.profile} alt='' width="60" height="60" className="d-inline-block align-text-top rounded-circle"/>
+      <h5 className='mt-3 ms-2' >{userData.first_name} {userData.last_name}</h5>
     </div>
-    <a className="navbar-brand" href="#">
-       {userData.first_name}
-    </a>
-    <div style={{cursor:"pointer"}} className="navbar-brand d-flex">
+    {/* <div style={{cursor:"pointer"}} className="navbar-brand d-flex">
    <Link to={'/post'} style={{textDecoration:"none",color:"black"}}>Create Post <IoIosCreate size={25}/></Link>
-    </div> 
-    <a className="navbar-brand"  onClick={()=>{
-      localStorage.removeItem('token')
-      navigate('/login')
-    }}>
+    </div>  */}
+    {createPostlable}
+    <a className="navbar-brand" style={{cursor:"pointer"}} onClick={handleLogout}>
      Logout <BiLogOut />
     </a>
   </div>

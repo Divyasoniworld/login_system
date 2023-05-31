@@ -37,7 +37,9 @@ const handleLogin = (e) =>{
      setError(response.data.massage)
    }else{
     var token = response.data.data.token
+    var id = response.data.data.id
     localStorage.setItem('token',token);
+    localStorage.setItem('UserId',id);
     
     var gettoken = localStorage.getItem('token');
     console.log(gettoken);
@@ -45,7 +47,7 @@ const handleLogin = (e) =>{
       setError('User Data not found')
     } else if(response.data.data.role == 'user'){
       console.log(response.data.data);
-      navigate('/home',{state : response.data.data} )
+      navigate('/home/posts',{state : response.data.data} )
     }else{
       navigate('/dashboard',{state : response.data.data} )
     }

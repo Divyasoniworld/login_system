@@ -6,6 +6,7 @@ const Auth = require('./modal');
 const multer = require('multer');
 const path = require('path');
 const { required } = require('../../../language/en');
+const { log } = require('util');
 
 
 var storage = multer.diskStorage({
@@ -34,14 +35,16 @@ router.post('/createpost',postupload,(req,res)=>{
 
 })
 
-router.post('/postlike',postupload,(req,res)=>{
+router.post('/postlike',(req,res)=>{
 
     var request = req.body;
     //  middleware.decryption(req.body,(request)=>{
         var user_id = req.user_id;
-        var request = req.body
+        var post_id = req.headers.id
+        // var request = req.body
+        // console.log("request",req.headers.id);
         
-            Auth.post_like(request,user_id,(code,message,data) => {
+            Auth.post_like(post_id,user_id,(code,message,data) => {
                 middleware.sendResponse(req, res, code, message ,data)
             })
 
@@ -50,9 +53,22 @@ router.post('/postlike',postupload,(req,res)=>{
 router.get('/allposts',(req,res)=>{
 
     var request = req.body;
+ console.log('token',req.headers.token);
+ var user_id = req.user_id
+    //  middleware.decryption(req.body,(request)=>{
+            Auth.allpost(req,user_id,(code,message,data) => {
+                middleware.sendResponse(req, res, code, message ,data)
+            })
+
+})
+
+router.get('/totallikes',(req,res)=>{
+
+    var request = req.body;
+    var user_id = req.user_id;
  
     //  middleware.decryption(req.body,(request)=>{
-            Auth.allpost(request,(code,message,data) => {
+            Auth.likeCount(request,user_id,(code,message,data) => {
                 middleware.sendResponse(req, res, code, message ,data)
             })
 

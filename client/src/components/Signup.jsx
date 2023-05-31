@@ -1,6 +1,7 @@
-import {useState} from 'react'
+import { useState} from 'react'
 import "../css/signup.css"
 import { Link ,useNavigate} from 'react-router-dom'
+import {FcGoogle} from 'react-icons/fc'
 import axios from 'axios';
 
 function Signup() {
@@ -14,6 +15,21 @@ function Signup() {
     const [email,setEmail] = useState('');
     const [password,setPassword] = useState('');
     const [Error,setError] = useState("");
+
+    const handleGoogleSubmit = () =>{
+      axios.get('http://localhost:9595/api/v1/auth/google')
+      .then((response) => {
+        if (response.data.message) {
+              setError(response.data.message)
+            } else {
+              navigate('/login')
+            }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  
+    }
 
 
     const handleSubmit = (e) =>{
@@ -40,6 +56,11 @@ function Signup() {
           console.error(error);
         });
     }
+
+
+    if (Error.length > 0) {
+      var allerr = <div class="alert alert-danger col-sm-12">{Error}</div>
+    } 
 
 
   return (
@@ -72,8 +93,12 @@ function Signup() {
 		<div className="form-group">
             <button type="submit" onClick={handleSubmit}  className="btn btn-primary btn-lg">Sign Up</button>
         </div>
+        <Link to={'/google'}><FcGoogle size={36} onClick={handleGoogleSubmit} /></Link>
     </form>
+    
+    {allerr}
 	<div className="text-center">Already have an account? <Link to="/login">Login here</Link></div>
+
 </div>
 
    </>

@@ -69,8 +69,7 @@ var middleware = {
                 : "";
 
         const path_data = req.path.split("/");
-        // console.log(path_data);
-        var bypassApi = new Array("forgotpassword", "forgot", "forgoted", "upload","signup");
+        var bypassApi = new Array("forgotpassword", "forgot", "forgoted", "upload","signup","google");
 
         if (bypassApi.indexOf(path_data[4]) === -1) {
             if (api_key != "") {
@@ -129,7 +128,8 @@ var middleware = {
             "forgot",
             "alluser",
             "delete",
-            "upload"
+            "upload",
+            "google"
         );
 
         if (
@@ -139,8 +139,6 @@ var middleware = {
             if (headertoken != "") {
                 try {
                     // var dec_token = cryptLib.decrypt(c, shakey, process.env.IV);
-
-                    console.log(headertoken);
                     if (headertoken != '') {
                         con.query(`SELECT * FROM tbl_device_info WHERE token = ?`,
                             [headertoken],(error, result) => {
@@ -171,7 +169,6 @@ var middleware = {
                         });
                     }
                 } catch (error) {
-                    console.log(error);
                     response_data = {
                         code: "0",
                         massage: "Invalid provided token",

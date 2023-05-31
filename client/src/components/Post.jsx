@@ -33,7 +33,7 @@ let config = {
 axios.request(config)
 .then((response) => {
 console.log('response' , response);
- navigate('/home')
+ navigate('/home/posts')
 })
 .catch((error) => {
   console.log(error);

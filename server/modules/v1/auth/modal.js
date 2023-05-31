@@ -8,6 +8,7 @@ const { request, response } = require('express');
 const { rest_keyword_user_details } = require('../../../language/en');
 const { use } = require('./route');
 
+
 var Auth = {
 
     signup : (request,req, callback) => {
@@ -149,7 +150,6 @@ var Auth = {
             con.query(`SELECT u.id,u.role,u.first_name,u.last_name,concat('${globals.BASE_URL}','${globals.user}',u.profile) as profile,u.email,u.password,u.mobile,u.login_status,DATE_FORMAT(u.logged_in_time,'%d %M, %Y') as login_time,u.is_forgot,u.forgot_time,ifnull(di.token,'') as token,ifnull(di.device_type,'') as device_type,ifnull(di.device_token,'') as device_token FROM tbl_user u
             LEFT JOIN tbl_device_info di ON di.user_id = u.id
             WHERE u.id = ? AND u.is_active = 1 AND u.is_delete = '0';`,[user_id],(error,result) => {
-                console.log(result);
                 var userdata = result[0];
                 if (!error && result.length > 0) {
                     callback('1',{keyword:'user login'},userdata);

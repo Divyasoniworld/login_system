@@ -25,7 +25,10 @@
     "node-async-loop": "^1.2.2",
     "nodemailer": "^6.9.1",
     "nodemon": "^2.0.22",
+    "passport": "^0.6.0",
+    "passport-google-oauth2": "^0.2.0",
     "rand-token": "^1.0.1",
+    "sweetalert": "^2.1.2",
     "Validator": "^1.1.4"
   }
 }

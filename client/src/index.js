@@ -18,7 +18,7 @@ root.render(
    <Route exact path="/dashboard" element={<Dashboard />} />
    <Route exact path="/" element={<Signup />} />
    <Route exact path="/login" element={<Login />} />
-   <Route exact path="/home" element={<Home />} />
+   <Route exact path="/home/posts" element={<Home />} />
    <Route exact path="/header" element={<Header />} />
    <Route exact path="/post" element={<Post />} />
 </Routes>
