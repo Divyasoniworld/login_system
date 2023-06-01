@@ -69,7 +69,7 @@ var Auth = {
 
     allpost: (req, user_id, callback) => {
         con.query(`SELECT
-      p.id,
+      p.id,u.id as post_user_id,
      CONCAT('${globals.BASE_URL}', '${globals.user}', u.profile) AS profile,u.username,u.login_status,
       CONCAT('${globals.BASE_URL}', '${globals.post}', p.image) AS image,
       (SELECT COUNT(pl.id) FROM tbl_post_like pl WHERE p.id = pl.post_id AND pl.is_like = 1) AS likes,
@@ -87,9 +87,36 @@ var Auth = {
   LEFT JOIN tbl_post_like pl ON p.id = pl.post_id
   LEFT JOIN tbl_user u ON pl.user_id = u.id
   GROUP BY p.id ORDER BY p.created_at DESC`, (error, result) => {
-            console.log(error);
             if (!error && result.length > 0) {
+                callback('1', { keyword: "post data" }, result);
+            } else {
+                callback('0', { keyword: 'somthing went wrong' }, {})
+            }
+        })
+    },
 
+    uservisepost: (user_id, callback) => {
+        con.query(`SELECT
+        p.id,u.id as post_user_id,
+       CONCAT('${globals.BASE_URL}', '${globals.user}', u.profile) AS profile,u.username,u.login_status,
+        CONCAT('${globals.BASE_URL}', '${globals.post}', p.image) AS image,
+        (SELECT COUNT(pl.id) FROM tbl_post_like pl WHERE p.id = pl.post_id AND pl.is_like = 1) AS likes,
+        (
+            SELECT
+                CASE
+                    WHEN pl.is_like = 1 THEN 1
+                    ELSE 0
+                END
+            FROM tbl_post_like pl
+            WHERE p.id = pl.post_id AND pl.user_id = ${user_id}
+        ) AS post_like
+    FROM
+        tbl_post p
+    LEFT JOIN tbl_post_like pl ON p.id = pl.post_id
+    LEFT JOIN tbl_user u ON pl.user_id = u.id
+    WHERE p.user_id = ${user_id}
+    GROUP BY p.id ORDER BY p.created_at DESC;`, (error, result) => {
+            if (!error && result.length > 0) {
                 callback('1', { keyword: "post data" }, result);
             } else {
                 callback('0', { keyword: 'somthing went wrong' }, {})
@@ -165,7 +192,78 @@ var Auth = {
                 callback('0', { keyword: 'something wrong' }, {});
             }
         })
-    }
+    },
+
+    user_follow: (follow_id, user_id, callback) => {
+       Auth.follow(follow_id,user_id,(followData)=>{
+          if (followData == false) {
+            var requestData = {
+                user_id : user_id,
+                follow_id : follow_id    
+            }
+             con.query(`INSERT INTO tbl_request SET ?`,[requestData],(error,result)=>{
+               if (!error) {
+                callback('1',{keyword : "request sent successfully"},{insetId : result.insetId})
+            } else {
+                   callback('0',{keyword : "something went wrong"},{})
+                
+               }
+             })
+          } else {
+            con.query(`DELETE FROM tbl_request WHERE user_id = ? AND follow_id = ?`,[user_id,follow_id],(error,result)=>{
+                if (!error) {
+                    callback('1',{keyword : "unfollow"},{})
+                } else {
+                    callback('0',{keyword : "something went wrong"},{})
+                }
+            })
+          }
+       })
+    },
+
+    follow: (follow_id, user_id, callback) => {
+        con.query(`SELECT * FROM tbl_request WHERE user_id = ? AND follow_id = ?`, [user_id, follow_id], (error, result) => {
+            if (!error && result.length > 0) {
+                callback(result)
+            } else {
+                callback(false)
+            }
+        })
+    },
+
+    allrequest: (user_id, callback) => {
+       con.query(`SELECT r.id,r.user_id,CONCAT('${globals.BASE_URL}', '${globals.user}', u.profile) AS profile,u.username,r.created_at,r.updated_at FROM tbl_request r 
+       JOIN tbl_user u ON r.user_id = u.id
+       WHERE r.follow_id = ? AND status = "Pending";`,[user_id],(error,result)=>{
+        if (!error && result.length > 0) {
+            callback('1',{keyword : "user requests"},result)
+        } else {
+            callback('0',{keyword : "something went wrong"},{}) 
+        }
+       })
+    },
+
+    requestConfirm: (follow_id,user_id, callback) => {
+        // console.log(follow_id);
+        console.log(user_id);
+        con.query(`UPDATE tbl_request r SET r.status = 'Accepted' WHERE r.follow_id = ? AND r.user_id = ? `,[follow_id,user_id],(error,result)=>{
+         if (!error && result.length > 0) {
+             callback('1',{keyword : "user requests"},result)
+         } else {
+             callback('0',{keyword : "something went wrong"},{}) 
+         }
+        })
+     },
+
+     requestDelete: (follow_id,user_id, callback) => {
+        con.query(`UPDATE tbl_request r SET r.status = 'Rejected' WHERE r.follow_id = ? AND r.user_id = ? `,[follow_id,user_id],(error,result)=>{
+         if (!error && result.length > 0) {
+             callback('1',{keyword : "user requests"},result)
+         } else {
+             callback('0',{keyword : "something went wrong"},{}) 
+         }
+        })
+     },
 
 
 }

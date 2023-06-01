@@ -147,7 +147,7 @@ var Auth = {
     },
 
     singleuser : (user_id,callback) => {
-            con.query(`SELECT u.id,u.role,u.first_name,u.last_name,concat('${globals.BASE_URL}','${globals.user}',u.profile) as profile,u.email,u.password,u.mobile,u.login_status,DATE_FORMAT(u.logged_in_time,'%d %M, %Y') as login_time,u.is_forgot,u.forgot_time,ifnull(di.token,'') as token,ifnull(di.device_type,'') as device_type,ifnull(di.device_token,'') as device_token FROM tbl_user u
+            con.query(`SELECT u.id,u.role,u.username,u.first_name,u.last_name,concat('${globals.BASE_URL}','${globals.user}',u.profile) as profile,u.email,u.password,u.mobile,u.is_verified,u.login_status,DATE_FORMAT(u.logged_in_time,'%d %M, %Y') as login_time,u.is_forgot,u.forgot_time,ifnull(di.token,'') as token,ifnull(di.device_type,'') as device_type,ifnull(di.device_token,'') as device_token FROM tbl_user u
             LEFT JOIN tbl_device_info di ON di.user_id = u.id
             WHERE u.id = ? AND u.is_active = 1 AND u.is_delete = '0';`,[user_id],(error,result) => {
                 var userdata = result[0];
@@ -159,6 +159,30 @@ var Auth = {
     
             });
     },
+
+    followers : (follow_id,callback) => {
+        con.query(`SELECT COUNT(r.id) followers FROM tbl_request r WHERE r.follow_id = ? AND r.status='Accepted';`,[follow_id],(error,result) => {
+            if (!error && result.length > 0) {
+                callback('1',{keyword:'followers'},result);
+            }else{
+                callback('0',{keyword:'something went wrong'},{});
+            }
+
+        });
+        
+},
+
+following : (user_id,callback) => {
+    con.query(`SELECT COUNT(r.id) following FROM tbl_request r WHERE r.user_id = ? AND r.status='Accepted';`,[user_id],(error,result) => {
+        if (!error && result.length > 0) {
+            callback('1',{keyword:'following'},result);
+        }else{
+            callback('0',{keyword:'something went wrong'},{});
+        }
+
+    });
+    
+},
 
     // update_user : (request,user_id, callback) => {
 

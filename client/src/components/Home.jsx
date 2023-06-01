@@ -16,8 +16,8 @@ function Home() {
 
     var follow = `Follow +`;
 
-    const handlefollow = (postId) => {
-        alert(`follow postId : ${postId}`)
+    const handlefollow = (follow_id) => {
+        alert(`follow postId : ${follow_id}`)
     }
 
     const params = useParams();
@@ -58,10 +58,6 @@ function Home() {
         console.log(likeData);
         fetchpost()
     }, [refresh]);
-
-    // likeData[0].is_like == 1 && likeData[0].user_id == UserId
-
-    var alllikedata = [];
 
 const handleLike = (id) => {
         let config = {
@@ -107,11 +103,10 @@ const handleLike = (id) => {
                             return(
                             <div key={index} className="card mb-4">
                             <input type='hidden' value={post.id} />
-                            <div className="card-header d-flex ustify-content-center">
+                            <div className="card-header d-inline-flex">
                             <img src= {post.profile} alt='' width="50" height="50" className="d-inline-block align-text-top rounded-circle"/>
-                               <h5 className='ms-2'> {post.username}</h5>
-                               <button className='mx-2 px-2' style={{width:"auto",height : "30px"}} onClick={()=>{handlefollow(post.id)}}>{follow}</button>
-                                
+                               <h5 className='ms-2 mt-2'> {post.username}</h5>
+                               <button className='mx-2 px-2 mt-2' style={{width:"auto",height : "30px"}} onClick={()=>{handlefollow(post.post_user_id)}}>{follow}</button>
                             </div>
                             <div className="card-body">
                                 <img style={{width:'50%'}} src={post.image} alt='' />

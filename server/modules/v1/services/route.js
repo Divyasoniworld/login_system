@@ -52,8 +52,6 @@ router.post('/postlike',(req,res)=>{
 
 router.get('/allposts',(req,res)=>{
 
-    var request = req.body;
- console.log('token',req.headers.token);
  var user_id = req.user_id
     //  middleware.decryption(req.body,(request)=>{
             Auth.allpost(req,user_id,(code,message,data) => {
@@ -61,6 +59,16 @@ router.get('/allposts',(req,res)=>{
             })
 
 })
+
+router.get('/uservisepost',(req,res)=>{
+
+    var user_id = req.user_id
+       //  middleware.decryption(req.body,(request)=>{
+               Auth.uservisepost(user_id,(code,message,data) => {
+                   middleware.sendResponse(req, res, code, message ,data)
+               })
+   
+   })
 
 router.get('/totallikes',(req,res)=>{
 
@@ -74,39 +82,57 @@ router.get('/totallikes',(req,res)=>{
 
 })
 
-router.post('/add_product',(req,res)=>{
-    var request = req.body;
-    var rules = {
-        owner_id : "required",
-        title : "required",
-        category_id : "required",
-        description : "required",
-        per_day_price : "required",
-        per_week_price : "required",
-        per_month_price : "required",
-        bond_amount : "required",
-        location : "required",
-        latitude : "required",
-        condition_rating : "required",
-        availability_from : "required|date",
-        availability_to : "required|date|after:availability_from"
- 
-    }
- 
-    var message = {
-        required: req.language.required,
-    }
+router.post('/follow_request',(req,res)=>{
+
+    var follow_id = req.body.follow_id;
+    var user_id = req.user_id;
  
     //  middleware.decryption(req.body,(request)=>{
-        var user_id = req.user_id;
-        if (middleware.checkValidation(res,request,rules,message)) {
-            Auth.add_product(request,user_id,(code,message,data) => {
+            Auth.user_follow(follow_id,user_id,(code,message,data) => {
                 middleware.sendResponse(req, res, code, message ,data)
             })
-        } 
-  
-   })
-// })
+
+})
+
+router.post('/all_request',(req,res)=>{
+
+    // var follow_id = req.params.follow_id;
+    var user_id = req.user_id;
+//  console.log(follow_id);
+    //  middleware.decryption(req.body,(request)=>{
+            Auth.allrequest(user_id,(code,message,data) => {
+                middleware.sendResponse(req, res, code, message ,data)
+            })
+
+})
+
+router.post('/requestConfirm',(req,res)=>{
+
+          var follow_id = req.user_id;
+          var user_id = req.body.user_id;
+          console.log(follow_id);
+        //   var user_id
+
+            Auth.requestConfirm(follow_id,user_id,(code,message,data) => {
+                middleware.sendResponse(req, res, code, message ,data)
+            })
+
+})
+
+router.post('/requestDelete',(req,res)=>{
+
+    var follow_id = req.user_id;
+    var user_id = req.body.user_id;
+    console.log(follow_id);
+  //   var user_id
+
+      Auth.requestDelete(follow_id,user_id,(code,message,data) => {
+          middleware.sendResponse(req, res, code, message ,data)
+      })
+
+})
+
+
 
 router.post('/product_edit',(req,res)=>{
     var request = req.body;

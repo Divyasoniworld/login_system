@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import {useEffect} from 'react';
 import { useNavigate ,useLocation, Link} from 'react-router-dom'
-import {BiLogOut} from "react-icons/bi"
+import {BiLogOut,BiUserCheck} from "react-icons/bi"
+import {AiOutlineMessage} from "react-icons/ai"
 import {IoIosCreate} from "react-icons/io"
 import axios from 'axios';
 import swal from 'sweetalert'
@@ -16,7 +17,7 @@ function Header() {
 
 useEffect(() => {
   let config = {
-      method: 'get',
+      method: 'post',
       maxBodyLength: Infinity,
       url: 'http://localhost:9595/api/v1/auth/singleuser',
       headers: { 
@@ -58,6 +59,18 @@ const handleLogout = () =>{
 <Link to={'/post'} style={{textDecoration:"none",color:"black"}}>Create Post <IoIosCreate size={25}/></Link>
  </div> 
  }
+
+ if (userData.role == 'user') {
+  var showmessages = <div style={{cursor:"pointer"}} className="navbar-brand d-flex">
+<Link to={'/messages'} style={{textDecoration:"none",color:"black"}}>Messages <AiOutlineMessage size={25}/></Link>
+ </div> 
+ }
+
+ if (userData.role == 'user') {
+  var userRequest = <div style={{cursor:"pointer"}} className="navbar-brand d-flex">
+<Link to={'/home/request'} style={{textDecoration:"none",color:"black"}}>Requests <BiUserCheck size={25}/></Link>
+ </div> 
+ }
   
 
 
@@ -66,13 +79,18 @@ const handleLogout = () =>{
  <nav className="navbar bg-body-tertiary">
   <div className="container-fluid">
     <div className="navbar-brand d-flex">
-      <img src= {userData.profile} alt='' width="60" height="60" className="d-inline-block align-text-top rounded-circle"/>
-      <h5 className='mt-3 ms-2' >{userData.first_name} {userData.last_name}</h5>
+    <Link to={'/home/posts'}> <img src= {userData.profile} alt='' width="60" height="60" className="d-inline-block align-text-top rounded-circle"/></Link>
+      <Link to={'/home/profile'} className='mt-3 ms-2' style={{textDecoration:"none",color:"black"}}>{userData.first_name} {userData.last_name}</Link>
+      {/* <h5 className='mt-3 ms-2' >{userData.first_name} {userData.last_name}</h5> */}
     </div>
     {/* <div style={{cursor:"pointer"}} className="navbar-brand d-flex">
    <Link to={'/post'} style={{textDecoration:"none",color:"black"}}>Create Post <IoIosCreate size={25}/></Link>
     </div>  */}
     {createPostlable}
+
+    {userRequest}
+
+    {showmessages}
     <a className="navbar-brand" style={{cursor:"pointer"}} onClick={handleLogout}>
      Logout <BiLogOut />
     </a>

@@ -104,7 +104,7 @@ router.get('/alluser', (req, res) => {
 
 })
 
-router.get('/singleuser', (req, res) => {
+router.post('/singleuser', (req, res) => {
 
     
     var request = req.body;
@@ -118,6 +118,37 @@ router.get('/singleuser', (req, res) => {
     //  })
 
 })
+
+router.post('/followers', (req, res) => {
+
+    
+    // var request = req.body;
+    // middleware.decryption(req.body,(request)=>{
+    var follow_id = req.body.follow_id;
+
+        Auth.followers(follow_id,(code, message, data) => {
+            middleware.sendResponse(req, res, code, message, data)
+        })
+
+    //  })
+
+})
+
+router.post('/following', (req, res) => {
+
+    
+    // var request = req.body;
+    // middleware.decryption(req.body,(request)=>{
+    var user_id = req.body.user_id;
+
+        Auth.following(user_id,(code, message, data) => {
+            middleware.sendResponse(req, res, code, message, data)
+        })
+
+    //  })
+
+})
+
 
 router.put('/delete/:id', (req, res) => {
 
