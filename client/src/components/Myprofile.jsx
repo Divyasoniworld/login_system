@@ -5,7 +5,7 @@ import { AiOutlineHeart, AiOutlineComment, AiOutlineShareAlt ,AiFillHeart} from 
 import { VscVerifiedFilled } from 'react-icons/vsc'
 import axios from 'axios'
 
-function UserProfile() {
+function Myprofile() {
 
   const token = localStorage.getItem('token')
   const follow_id = localStorage.getItem('UserId')
@@ -24,7 +24,7 @@ function UserProfile() {
   }, [refresh]);
 
   const fetchPosts = () => {
-    axios.get('http://localhost:9595/api/v1/uservisepost',
+    axios.get('http://localhost:9595/api/v1/myprofile',
       {
         headers: {
           'api-key': 'XnOBHi0M9hkUAI2RWa7J6zZn5NsEm1ofrZy5uVybFTw=XnOBHi0M9hkUAI2RWa7J6zZn5NsEm1ofrZy5uVybFTw=',
@@ -63,7 +63,7 @@ function UserProfile() {
     let config = {
       method: 'post',
       maxBodyLength: Infinity,
-      url: 'http://localhost:9595/api/v1/auth/singleuser',
+      url: `http://localhost:9595/api/v1/auth/singleuser`,
       headers: {
         'api-key': 'XnOBHi0M9hkUAI2RWa7J6zZn5NsEm1ofrZy5uVybFTw=XnOBHi0M9hkUAI2RWa7J6zZn5NsEm1ofrZy5uVybFTw=',
         'token': `${token}`,
@@ -143,14 +143,20 @@ setRefresh(!refresh)
           <header class="row">
             <div class="col-sm-2">
               <a href="#" class="profile-picture">
-                <img src={userData.profile} className="rounded" style={{ width: '50%' }} /> </a>
+                <img src={userData.profile} className="rounded" style={{ width: '50%',float:'left' }} /> </a>
             </div>
-            <div class="col-sm-7">
+            <div class="col-sm-7 w-100">
               <ul class="profile-info-sections">
                 <li>
                   <div className="d-inline-flex place-item-center gap-1">
                     <div className='text-black'>{userData.first_name} {userData.last_name}</div>
                     {verified}
+                  </div>
+                </li>
+                <li>
+                  <div class="d-flex gap-2">
+                    <h3 className='text-black h5'>{posts.length}</h3>
+                    <div className='text-black'>Posts</div>
                   </div>
                 </li>
                 <li>
@@ -191,4 +197,4 @@ setRefresh(!refresh)
   )
 }
 
-export default UserProfile
+export default Myprofile

@@ -50,6 +50,21 @@ router.post('/postlike',(req,res)=>{
 
 })
 
+router.post('/userpostlike',(req,res)=>{
+
+    var request = req.body;
+    //  middleware.decryption(req.body,(request)=>{
+        var user_id = req.headers.user_id;
+        var post_id = req.headers.id
+        // var request = req.body
+        // console.log("request",req.headers.id);
+        
+            Auth.user_post_like(post_id,user_id,(code,message,data) => {
+                middleware.sendResponse(req, res, code, message ,data)
+            })
+
+})
+
 router.get('/allposts',(req,res)=>{
 
  var user_id = req.user_id
@@ -60,9 +75,20 @@ router.get('/allposts',(req,res)=>{
 
 })
 
-router.get('/uservisepost',(req,res)=>{
+router.get('/myprofile',(req,res)=>{
 
     var user_id = req.user_id
+       //  middleware.decryption(req.body,(request)=>{
+               Auth.myprofilepost(user_id,(code,message,data) => {
+                   middleware.sendResponse(req, res, code, message ,data)
+               })
+   
+   })
+
+router.get('/uservisepost/:id',(req,res)=>{
+
+    var user_id = req.params.id
+    console.log('param',req.params.id);
        //  middleware.decryption(req.body,(request)=>{
                Auth.uservisepost(user_id,(code,message,data) => {
                    middleware.sendResponse(req, res, code, message ,data)
@@ -106,6 +132,19 @@ router.post('/all_request',(req,res)=>{
 
 })
 
+router.get('/getreqdata',(req,res)=>{
+
+    // var follow_id = req.params.follow_id;
+    var follow_id = req.user_id;
+    var user_id = req.headers.user_id
+ console.log('follow_id',follow_id);
+    //  middleware.decryption(req.body,(request)=>{
+            Auth.getreqdata(follow_id,user_id,(code,message,data) => {
+                middleware.sendResponse(req, res, code, message ,data)
+            })
+
+})
+
 router.post('/requestConfirm',(req,res)=>{
 
           var follow_id = req.user_id;
@@ -127,6 +166,18 @@ router.post('/requestDelete',(req,res)=>{
   //   var user_id
 
       Auth.requestDelete(follow_id,user_id,(code,message,data) => {
+          middleware.sendResponse(req, res, code, message ,data)
+      })
+
+})
+
+router.post('/findone',(req,res)=>{
+
+    var request = req.body;
+    var user_id = req.user_id;
+  //   var user_id
+
+      Auth.findone(request,user_id,(code,message,data) => {
           middleware.sendResponse(req, res, code, message ,data)
       })
 

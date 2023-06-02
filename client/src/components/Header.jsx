@@ -3,12 +3,12 @@ import {useEffect} from 'react';
 import { useNavigate ,useLocation, Link} from 'react-router-dom'
 import {BiLogOut,BiUserCheck} from "react-icons/bi"
 import {AiOutlineMessage} from "react-icons/ai"
+import {BsSearchHeart} from "react-icons/bs"
 import {IoIosCreate} from "react-icons/io"
 import axios from 'axios';
 import swal from 'sweetalert'
 
-function Header() {
-
+function Header(props) {
   const [userData, setUserData] = useState({})
     const navigate = useNavigate();
   const location = useLocation();
@@ -52,6 +52,12 @@ const handleLogout = () =>{
 }
 
 
+if (userData.role == 'user') {
+  var search = <div style={{cursor:"pointer"}} className="navbar-brand d-flex">
+<Link to={'/findone'} style={{textDecoration:"none",color:"black"}}>Search <BsSearchHeart size={25}/></Link>
+ </div> 
+ }
+
 
 
  if (userData.role == 'user') {
@@ -68,7 +74,7 @@ const handleLogout = () =>{
 
  if (userData.role == 'user') {
   var userRequest = <div style={{cursor:"pointer"}} className="navbar-brand d-flex">
-<Link to={'/home/request'} style={{textDecoration:"none",color:"black"}}>Requests <BiUserCheck size={25}/></Link>
+<Link to={'/home/request'} style={{textDecoration:"none",color:"black"}}>Requests <span class="badge rounded-pill badge-notification bg-danger">{props.ReqCount}</span> <BiUserCheck size={25}/></Link>
  </div> 
  }
   
@@ -86,6 +92,7 @@ const handleLogout = () =>{
     {/* <div style={{cursor:"pointer"}} className="navbar-brand d-flex">
    <Link to={'/post'} style={{textDecoration:"none",color:"black"}}>Create Post <IoIosCreate size={25}/></Link>
     </div>  */}
+    {search}
     {createPostlable}
 
     {userRequest}

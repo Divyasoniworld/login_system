@@ -119,6 +119,21 @@ router.post('/singleuser', (req, res) => {
 
 })
 
+router.post('/searchuser/:id', (req, res) => {
+
+    
+    var request = req.body;
+    // middleware.decryption(req.body,(request)=>{
+    var user_id = req.params.id;
+
+        Auth.singleuser(user_id,(code, message, data) => {
+            middleware.sendResponse(req, res, code, message, data)
+        })
+
+    //  })
+
+})
+
 router.post('/followers', (req, res) => {
 
     

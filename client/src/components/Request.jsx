@@ -79,7 +79,7 @@ function Request() {
 
     return (
         <>
-            <Header />
+            <Header ReqCount = {requestData.length} />
             <div className='main-container'>
                 {requestData.length > 0 ? requestData.map((rData, key) => {
                     return (
