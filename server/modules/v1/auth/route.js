@@ -5,6 +5,7 @@ const middleware = require('../../../middleware/validator');
 const Auth = require('./modal');
 const multer = require('multer');
 const path = require('path');
+const { log } = require('console');
 
 
 //upload image
@@ -126,7 +127,7 @@ router.post('/searchuser/:id', (req, res) => {
     // middleware.decryption(req.body,(request)=>{
     var user_id = req.params.id;
 
-        Auth.singleuser(user_id,(code, message, data) => {
+        Auth.searchuser(user_id,(code, message, data) => {
             middleware.sendResponse(req, res, code, message, data)
         })
 
@@ -139,9 +140,26 @@ router.post('/followers', (req, res) => {
     
     // var request = req.body;
     // middleware.decryption(req.body,(request)=>{
+        var user_id = req.user_id
     var follow_id = req.body.follow_id;
 
         Auth.followers(follow_id,(code, message, data) => {
+            middleware.sendResponse(req, res, code, message, data)
+        })
+
+    //  })
+
+})
+
+router.post('/postcount', (req, res) => {
+
+    
+    // var request = req.body;
+    // middleware.decryption(req.body,(request)=>{
+        var user_id = req.user_id
+    var user_id = req.body.follow_id;
+
+        Auth.postcount(user_id,(code, message, data) => {
             middleware.sendResponse(req, res, code, message, data)
         })
 

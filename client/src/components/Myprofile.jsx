@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from 'react'
 import Header from './Header'
 import '../css/userprofile.css'
-import { AiOutlineHeart, AiOutlineComment, AiOutlineShareAlt ,AiFillHeart} from 'react-icons/ai'
+import { AiOutlineHeart, AiOutlineComment, AiOutlineShareAlt, AiFillHeart } from 'react-icons/ai'
 import { VscVerifiedFilled } from 'react-icons/vsc'
+import Switch from '@mui/material/Switch';
 import axios from 'axios'
 
 function Myprofile() {
 
+
+const label = { inputProps: { 'aria-label': 'Switch demo' } };
+
   const token = localStorage.getItem('token')
   const follow_id = localStorage.getItem('UserId')
   const [posts, setPosts] = useState([]);
-  const [likeData,setLikeData] = useState([]) 
+  const [accprivate, setAccPrivate] = useState('');
+  const [likeData, setLikeData] = useState([])
   const [refresh, setRefresh] = useState()
   const [followers, setFollowers] = useState(0);
   const [following, setFollowing] = useState(0);
@@ -21,7 +26,7 @@ function Myprofile() {
     fetchFollowers();
     fetchFollowing();
     fetchsingleUser();
-  }, [refresh]);
+  }, [refresh,accprivate]);
 
   const fetchPosts = () => {
     axios.get('http://localhost:9595/api/v1/myprofile',
@@ -74,6 +79,7 @@ function Myprofile() {
     axios.request(config)
       .then((response) => {
         setUserData(response.data.data)
+        console.log(response.data.data.is_private);
       })
       .catch((error) => {
         console.log(error);
@@ -101,27 +107,50 @@ function Myprofile() {
 
   const handleLike = (id) => {
     let config = {
-        method: 'post',
-        maxBodyLength: Infinity,
-        url: `http://localhost:9595/api/v1/postlike`,
-        headers: { 
-          'api-key': 'XnOBHi0M9hkUAI2RWa7J6zZn5NsEm1ofrZy5uVybFTw=XnOBHi0M9hkUAI2RWa7J6zZn5NsEm1ofrZy5uVybFTw=',
-          'token' : `${token}`, 
-          'Content-Type': 'application/json',
-          'id' : `${id}`
-        },
-      };
-      
-  axios.request(config)
-  .then((response) => {
-setLikeData(response.data.data[0])
-  
-setRefresh(!refresh)
-  })
-  .catch((error) => {
-    console.log(error);
-  });
-} 
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: `http://localhost:9595/api/v1/postlike`,
+      headers: {
+        'api-key': 'XnOBHi0M9hkUAI2RWa7J6zZn5NsEm1ofrZy5uVybFTw=XnOBHi0M9hkUAI2RWa7J6zZn5NsEm1ofrZy5uVybFTw=',
+        'token': `${token}`,
+        'Content-Type': 'application/json',
+        'id': `${id}`
+      },
+    };
+
+    axios.request(config)
+      .then((response) => {
+        setLikeData(response.data.data[0])
+
+        setRefresh(!refresh)
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  const handlePrivate = () =>{
+
+    let config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: `http://localhost:9595/api/v1/private_acc`,
+      headers: {
+        'api-key': 'XnOBHi0M9hkUAI2RWa7J6zZn5NsEm1ofrZy5uVybFTw=XnOBHi0M9hkUAI2RWa7J6zZn5NsEm1ofrZy5uVybFTw=',
+        'token': `${token}`,
+        'Content-Type': 'application/json'
+      },
+    };
+
+    axios.request(config)
+      .then((response) => {
+        setAccPrivate(response.data.data)
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+  }
 
 
   var verified;
@@ -143,9 +172,9 @@ setRefresh(!refresh)
           <header class="row">
             <div class="col-sm-2">
               <a href="#" class="profile-picture">
-                <img src={userData.profile} className="rounded" style={{ width: '50%',float:'left' }} /> </a>
+                <img src={userData.profile} className="rounded" style={{ width: '50%', float: 'left' }} /> </a>
             </div>
-            <div class="col-sm-7 w-100">
+            <div class="col-sm-9 w-100">
               <ul class="profile-info-sections">
                 <li>
                   <div className="d-inline-flex place-item-center gap-1">
@@ -171,24 +200,31 @@ setRefresh(!refresh)
                     <div className='text-black'>Following</div>
                   </div>
                 </li>
+                <li>
+                  <div>
+                   <label className='text-dark'>Private Account</label>
+                   {/* <Switch  /> */}
+                 {userData.is_private !== 1 ?  <Switch onClick={handlePrivate} /> : <Switch onClick={handlePrivate} checked />} 
+                  </div>
+                </li>
               </ul>
             </div>
           </header>
         </div>
         <hr></hr>
         <div className="row">
-          {posts.length > 0 ?  posts.map((post)=>{
-            return(
-          <div className="col-md-3 mt-4">
-            <img src={post.image} alt='' width={'60%'} height={'90%'} />
-            <div className="footer">
-            {(post.likes > 0) ? post.likes : ""} {(post.post_like == 1) ? <AiFillHeart style={{color:"red",cursor:"pointer"}}  onClick={() => {handleLike(post.id)}} size={35} /> : <AiOutlineHeart style={{cursor : "pointer"}} onClick={() => {handleLike(post.id)}} size={35} />}
-            <AiOutlineComment size={30} />
-              <AiOutlineShareAlt size={30} />
-            </div>
-          </div>
+          {posts.length > 0 ? posts.map((post) => {
+            return (
+              <div className="col-md-3 mt-4">
+                <img src={post.image} alt='' width={'60%'} height={'90%'} />
+                <div className="footer">
+                  {(post.likes > 0) ? post.likes : ""} {(post.post_like == 1) ? <AiFillHeart style={{ color: "red", cursor: "pointer" }} onClick={() => { handleLike(post.id) }} size={35} /> : <AiOutlineHeart style={{ cursor: "pointer" }} onClick={() => { handleLike(post.id) }} size={35} />}
+                  <AiOutlineComment size={30} />
+                  <AiOutlineShareAlt size={30} />
+                </div>
+              </div>
             )
-          }): 'No posts found'}
+          }) : 'No posts found'}
         </div>
       </div>
 

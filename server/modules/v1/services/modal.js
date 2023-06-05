@@ -7,9 +7,11 @@ const common = require('../../../config/common');
 const emailtemplate = require('../../../config/template');
 const user = require('../auth/modal');
 const { ifError } = require('assert');
-const { error } = require('console');
+const { error, log } = require('console');
 
 con = require('../../../config/database');
+
+
 
 var Auth = {
 
@@ -68,7 +70,7 @@ var Auth = {
     //   GROUP BY p.id;
 
     allpost: (req, user_id, callback) => {
-        con.query(`SELECT
+       let devv = con.query(`SELECT
       p.id,u.id as post_user_id,
      CONCAT('${globals.BASE_URL}', '${globals.user}', u.profile) AS profile,u.username,u.login_status,
       CONCAT('${globals.BASE_URL}', '${globals.post}', p.image) AS image,
@@ -87,6 +89,7 @@ var Auth = {
   LEFT JOIN tbl_post_like pl ON p.id = pl.post_id
   LEFT JOIN tbl_user u ON pl.user_id = u.id
   GROUP BY p.id ORDER BY p.created_at DESC`, (error, result) => {
+    console.log(devv.sql);
             if (!error && result.length > 0) {
                 callback('1', { keyword: "post data" }, result);
             } else {
@@ -95,10 +98,12 @@ var Auth = {
         })
     },
 
-    uservisepost: (user_id, callback) => {
-        con.query(`SELECT
+ 
+
+    uservisepost: (follow_id,user_id, callback) => {
+     con.query(`SELECT
         p.id,u.id as post_user_id,
-       CONCAT('${globals.BASE_URL}', '${globals.user}', u.profile) AS profile,u.username,u.login_status,
+       CONCAT('${globals.BASE_URL}', '${globals.user}', u.profile) AS profile,u.username,u.is_private,u.login_status,
         CONCAT('${globals.BASE_URL}', '${globals.post}', p.image) AS image,
         (SELECT COUNT(pl.id) FROM tbl_post_like pl WHERE p.id = pl.post_id AND pl.is_like = 1) AS likes,
         (
@@ -116,8 +121,15 @@ var Auth = {
     LEFT JOIN tbl_user u ON pl.user_id = u.id
     WHERE p.user_id = ${user_id}
     GROUP BY p.id ORDER BY p.created_at DESC;`, (error, result) => {
+        console.log("error",result);
             if (!error && result.length > 0) {
-                callback('1', { keyword: "post data" }, result);
+                Auth.getsinglereq(follow_id,user_id,(Data)=>{
+                    if (Data == false) {
+                        callback('0', { keyword: 'somthing went wrong' }, {result:result,request : 0})
+                    }else{
+                    callback('1', { keyword: "post data" }, {result:result,request : Data});
+                }
+               })
             } else {
                 callback('0', { keyword: 'somthing went wrong' }, {})
             }
@@ -325,8 +337,7 @@ var Auth = {
     },
 
     getreqdata: (follow_id,user_id, callback) => {
-        con.query(`SELECT * FROM tbl_request r WHERE r.user_id = ? AND r.follow_id = ?;`,[user_id,follow_id],(error,result)=>{
-            console.log(user_id);
+        con.query(`SELECT * FROM tbl_request r WHERE r.user_id = ? AND r.follow_id = ?;`,[follow_id,user_id],(error,result)=>{
          if (!error && result.length > 0) {
              callback('1',{keyword : "user requests"},result)
          } else {
@@ -348,7 +359,9 @@ var Auth = {
      },
 
      requestDelete: (follow_id,user_id, callback) => {
-        con.query(`DELETE FROM tbl_request WHERE r.follow_id = ? AND r.user_id = ? `,[follow_id,user_id],(error,result)=>{
+        con.query(`DELETE FROM tbl_request  WHERE follow_id = ${follow_id} AND user_id = ${user_id} `,(error,result)=>{
+            console.log('error',error);
+            // console.log('user_id',user_id);
          if (!error && result.length > 0) {
              callback('1',{keyword : "user requests"},result)
          } else {
@@ -358,7 +371,8 @@ var Auth = {
      },
 
      findone: (request,user_id, callback) => {
-        con.query(`SELECT u.id,CONCAT('${globals.BASE_URL}', '${globals.user}', u.profile) AS profile,u.username FROM tbl_user u WHERE u.username LIKE "%${request.search}%" AND u.role = 'user' AND u.is_active = 1 AND u.is_delete = 0; `,[user_id],(error,result)=>{
+         con.query(`SELECT u.id,CONCAT('${globals.BASE_URL}', '${globals.user}', u.profile) AS profile,u.username FROM tbl_user u WHERE u.username LIKE "%${request.search}%" AND u.id != ? AND u.role = 'user' AND u.is_active = 1 AND u.is_delete = 0;`,[user_id],(error,result)=>{
+            console.log(error);
          if (!error && result.length > 0) {
              callback('1',{keyword : "user requests"},result)
          } else {
@@ -366,6 +380,51 @@ var Auth = {
          }
         })
      },
+
+     
+     private_acc: (user_id, callback) => {
+
+        con.query(`SELECT * FROM tbl_user WHERE id = ? AND role = 'user'`,[user_id],(error,result)=>{
+            if (!error && result.length > 0) {
+                if (result[0].is_private == 1) {
+                    con.query(`UPDATE tbl_user SET is_private = '0' WHERE id = ? `,[user_id],(error,result)=>{
+                        if (!error && result.length > 0) {
+                            callback('1',{keyword : "account open"},result)
+                        } else {
+                            callback('0',{keyword : "something went wrong"},{}) 
+                        }
+                        })
+                } else {
+                    con.query(`UPDATE tbl_user SET is_private = '1' WHERE id = ? `,[user_id],(error,result)=>{
+                        if (!error && result.length > 0) {
+                            callback('1',{keyword : "account private"},result)
+                        } else {
+                            callback('0',{keyword : "something went wrong"},{}) 
+                        }
+                        })
+                }
+               
+            } else {
+                callback('0',{keyword : "something went wrong"},{}) 
+            }
+        })
+
+       
+     },
+
+     getsinglereq : (user_id,follow_id,callback) => {
+        con.query(`SELECT * FROM tbl_request WHERE user_id = ? AND follow_id = ?`,[user_id,follow_id],(error,result)=>{
+            console.log(user_id);
+            console.log(follow_id);
+           if (!error && result.length > 0) {
+             callback(result[0])
+           } else {
+            callback(false)
+           }
+        })
+     }
+
+     
 
 
 }

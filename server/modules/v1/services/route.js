@@ -88,9 +88,9 @@ router.get('/myprofile',(req,res)=>{
 router.get('/uservisepost/:id',(req,res)=>{
 
     var user_id = req.params.id
-    console.log('param',req.params.id);
+    var follow_id = req.user_id
        //  middleware.decryption(req.body,(request)=>{
-               Auth.uservisepost(user_id,(code,message,data) => {
+               Auth.uservisepost(follow_id,user_id,(code,message,data) => {
                    middleware.sendResponse(req, res, code, message ,data)
                })
    
@@ -137,7 +137,6 @@ router.get('/getreqdata',(req,res)=>{
     // var follow_id = req.params.follow_id;
     var follow_id = req.user_id;
     var user_id = req.headers.user_id
- console.log('follow_id',follow_id);
     //  middleware.decryption(req.body,(request)=>{
             Auth.getreqdata(follow_id,user_id,(code,message,data) => {
                 middleware.sendResponse(req, res, code, message ,data)
@@ -162,7 +161,6 @@ router.post('/requestDelete',(req,res)=>{
 
     var follow_id = req.user_id;
     var user_id = req.body.user_id;
-    console.log(follow_id);
   //   var user_id
 
       Auth.requestDelete(follow_id,user_id,(code,message,data) => {
@@ -178,6 +176,18 @@ router.post('/findone',(req,res)=>{
   //   var user_id
 
       Auth.findone(request,user_id,(code,message,data) => {
+          middleware.sendResponse(req, res, code, message ,data)
+      })
+
+})
+
+router.post('/private_acc',(req,res)=>{
+
+    // var request = req.body;
+    var user_id = req.user_id;
+  //   var user_id
+
+      Auth.private_acc(user_id,(code,message,data) => {
           middleware.sendResponse(req, res, code, message ,data)
       })
 
