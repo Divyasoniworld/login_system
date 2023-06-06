@@ -21,6 +21,7 @@ function UserProfile() {
   const [postcount, setPostCount] = useState(0);
   const [userData, setUserData] = useState({})
   const [message, setMessage] = useState('')
+  const [sendrequest, setSendRequest] = useState('')
 
   useEffect(() => {
     fetchsingleUser() 
@@ -30,7 +31,7 @@ function UserProfile() {
     fetchFollowers();
     fetchFollowing();
     fetchsingleUser();
-  }, [refresh]);
+  }, [ sendrequest]);
 
   const sendRequest = () => {
     axios.post('http://localhost:9595/api/v1/follow_request', {
@@ -44,6 +45,7 @@ function UserProfile() {
         }
       })
       .then((response) => {
+        setSendRequest(response.data.data)
       })
       .catch((error) => {
         console.log(error);
@@ -80,7 +82,6 @@ function UserProfile() {
         }
       })
       .then((response) => {
-       console.log(posts);
         if (response.data.data.result[0].is_private == 0) {
           setPosts(response.data.data.result)
         } else {

@@ -308,20 +308,43 @@ var Auth = {
     user_follow: (follow_id, user_id, callback) => {
        Auth.follow(follow_id,user_id,(followData)=>{
           if (followData == false) {
-            var requestData = {
-                user_id : user_id,
-                follow_id : follow_id    
-            }
-             con.query(`INSERT INTO tbl_request SET ?`,[requestData],(error,result)=>{
-               if (!error) {
-                Auth.follow(follow_id,user_id,(rData)=>{
-                    callback('1',{keyword : "request sent successfully"},rData)
-                })
-            } else {
-                   callback('0',{keyword : "something went wrong"},{})
-                
-               }
-             })
+            con.query(`SELECT * FROM tbl_user WHERE id = ${follow_id}`,(error,result)=>{
+              if (error) {
+                callback('0',{keyword : "something went wrong"},{})
+              }else if(result[0].is_private == 0){
+                  var requestData = {
+                      user_id : user_id,
+                      follow_id : follow_id,
+                      status : 'Accepted'    
+                  }
+                   con.query(`INSERT INTO tbl_request SET ?`,[requestData],(error,result)=>{
+                     if (!error) {
+                      Auth.follow(follow_id,user_id,(rData)=>{
+                          callback('1',{keyword : "request sent successfully"},rData)
+                      })
+                  } else {
+                         callback('0',{keyword : "something went wrong"},{})
+                      
+                     }
+                   })
+              }else{
+                var requestData = {
+                    user_id : user_id,
+                    follow_id : follow_id   
+                }
+                 con.query(`INSERT INTO tbl_request SET ?`,[requestData],(error,result)=>{
+                   if (!error) {
+                    Auth.follow(follow_id,user_id,(rData)=>{
+                        callback('1',{keyword : "request sent successfully"},rData)
+                    })
+                } else {
+                       callback('0',{keyword : "something went wrong"},{})
+                    
+                   }
+                 })
+              }
+
+            })
           } else {
             con.query(`DELETE FROM tbl_request WHERE user_id = ? AND follow_id = ?`,[user_id,follow_id],(error,result)=>{
                 if (!error) {

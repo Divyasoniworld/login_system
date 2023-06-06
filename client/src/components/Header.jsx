@@ -10,12 +10,19 @@ import swal from 'sweetalert'
 
 function Header(props) {
   const [userData, setUserData] = useState({})
+  const [requestData, setRequestData] = useState([])
     const navigate = useNavigate();
   const location = useLocation();
   const auth = localStorage.getItem('token')
+  const follow_id = localStorage.getItem('UserId');
 
 
 useEffect(() => {
+singleuser()
+fetchAllRequest()
+}, [requestData]);
+
+const singleuser = () =>{
   let config = {
       method: 'post',
       maxBodyLength: Infinity,
@@ -34,7 +41,7 @@ setUserData(response.data.data)
 .catch((error) => {
   console.log(error);
 });
-}, []);
+}
 
 const handleLogout = () =>{
     swal({
@@ -49,6 +56,29 @@ const handleLogout = () =>{
         navigate('/login')
       } 
     });
+}
+
+const fetchAllRequest = () =>{
+  let config = {
+    method: 'post',
+    maxBodyLength: Infinity,
+    url: `http://localhost:9595/api/v1/all_request`,
+    headers: {
+        'api-key': 'XnOBHi0M9hkUAI2RWa7J6zZn5NsEm1ofrZy5uVybFTw=XnOBHi0M9hkUAI2RWa7J6zZn5NsEm1ofrZy5uVybFTw=',
+        'token': `${auth}`,
+        'Content-Type': 'application/json'
+    },
+    follow_id: follow_id
+};
+
+axios.request(config)
+    .then((response) => {
+        setRequestData(response.data.data)
+    })
+    .catch((error) => {
+        console.log(error);
+    });
+
 }
 
 
@@ -74,7 +104,7 @@ if (userData.role == 'user') {
 
  if (userData.role == 'user') {
   var userRequest = <div style={{cursor:"pointer"}} className="navbar-brand d-flex">
-<Link to={'/home/request'} style={{textDecoration:"none",color:"black"}}>Requests <span class="badge rounded-pill badge-notification bg-danger">{props.ReqCount}</span> <BiUserCheck size={25}/></Link>
+<Link to={'/home/request'} style={{textDecoration:"none",color:"black"}}>Requests <span class="badge rounded-pill badge-notification bg-danger">{requestData.length > 0 ? requestData.length : ''}</span> <BiUserCheck size={25}/></Link>
  </div> 
  }
   
