@@ -103,17 +103,16 @@ const handleLike = (id) => {
                             return(
                             <div key={index} className="card mb-4">
                             <input type='hidden' value={post.id} />
-                           <div className="card-header d-inline-flex">
+                           <div className="card-header d-flex place-item-center">
                             <img src= {post.profile} alt='' width="50" height="50" className="d-inline-block align-text-top rounded-circle"/>
-                            <Link to={`/findone/${post.post_user_id}`}> <h5 className='ms-2 mt-2'> {post.username}</h5></Link>
-                               <button className='mx-2 px-2 mt-2' style={{width:"auto",height : "30px"}} onClick={()=>{handlefollow(post.post_user_id)}}>{follow}</button>
+                            <Link to={`/findone/${post.user_id}`} className='text-decoration-none'> <h5 className='ms-2 mt-2 text-black '> {post.username}</h5></Link>
                             </div> 
                             <div className="card-body">
                                 <img style={{width:'50%'}} src={post.image} alt='' />
                             </div>
                             <div className="card-footer ">
                             
-                            {(post.likes > 0) ? post.likes : ""} {(post.post_like == 1) ? <AiFillHeart style={{color:"red",cursor:"pointer"}}  onClick={() => {handleLike(post.id)}} size={35} /> : <AiOutlineHeart style={{cursor : "pointer"}} onClick={() => {handleLike(post.id)}} size={35} />}
+                            {(post.like_count > 0) ? post.like_count : ""} {(post.post_like.length > 0) ? <AiFillHeart style={{color:"red",cursor:"pointer"}}  onClick={() => {handleLike(post.id)}} size={35} /> : <AiOutlineHeart style={{cursor : "pointer"}} onClick={() => {handleLike(post.id)}} size={35} />}
                              <AiOutlineComment size={30} />
                                 <AiOutlineShareAlt size={30} />
                             </div>

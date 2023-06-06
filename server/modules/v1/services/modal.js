@@ -69,72 +69,103 @@ var Auth = {
     //   LEFT JOIN tbl_post_like pl ON p.id = pl.post_id
     //   GROUP BY p.id;
 
-    allpost: (req, user_id, callback) => {
-       let devv = con.query(`SELECT
-      p.id,u.id as post_user_id,
-     CONCAT('${globals.BASE_URL}', '${globals.user}', u.profile) AS profile,u.username,u.login_status,
-      CONCAT('${globals.BASE_URL}', '${globals.post}', p.image) AS image,
-      (SELECT COUNT(pl.id) FROM tbl_post_like pl WHERE p.id = pl.post_id AND pl.is_like = 1) AS likes,
-      (
-          SELECT
-              CASE
-                  WHEN pl.is_like = 1 THEN 1
-                  ELSE 0
-              END
-          FROM tbl_post_like pl
-          WHERE p.id = pl.post_id AND pl.user_id = ${user_id}
-      ) AS post_like
-  FROM
-      tbl_post p
-  LEFT JOIN tbl_post_like pl ON p.id = pl.post_id
-  LEFT JOIN tbl_user u ON pl.user_id = u.id
-  GROUP BY p.id ORDER BY p.created_at DESC`, (error, result) => {
-    console.log(devv.sql);
-            if (!error && result.length > 0) {
-                callback('1', { keyword: "post data" }, result);
+    allpost : (user_id,callback) =>{
+        con.query(`SELECT p.id,p.user_id,CONCAT('${globals.BASE_URL}', '${globals.post}', p.image) AS image,p.description,p.created_at,p.updated_at, CONCAT('${globals.BASE_URL}', '${globals.user}', u.profile) AS profile,u.username,u.first_name,u.last_name,u.mobile,u.mobile,u.email,u.is_verified,u.is_private,u.login_status,(SELECT COUNT(pl.id) FROM tbl_post_like pl WHERE p.id = pl.post_id) as like_count FROM tbl_post p
+        JOIN tbl_user u ON p.user_id = u.id 
+        JOIN tbl_request r ON  r.follow_id = p.user_id 
+        WHERE r.user_id = ${user_id} AND r.status = "Accepted" AND (p.is_active = 1 AND p.is_delete = 0)`,(error,result)=>{
+    if (!error && result.length > 0) {
+      asyncLoop(result,(likes,next)=>{
+        con.query(`SELECT * FROM tbl_post_like WHERE post_id = ${likes.id} AND user_id = ${user_id}`,(error,result1)=>{
+            console.log(likes.id);
+            if (!error && result1.length > 0) {
+                likes.post_like = result1
+                next()
             } else {
-                callback('0', { keyword: 'somthing went wrong' }, {})
+                likes.post_like = []
+                next()
             }
         })
-    },
+      },()=>{
+        callback("1",{keyword : "all post"},result)
+      })
+    } else {
+        callback('0',{keyword : "something went wrong"},result)
+    }
+})
+     },
+
+
+     uservisepost : (follow_id,user_id,callback) =>{
+        console.log("user_id",user_id);
+        con.query(`SELECT p.id,p.user_id,CONCAT('${globals.BASE_URL}', '${globals.post}', p.image) AS image,p.description,p.created_at,p.updated_at, CONCAT('${globals.BASE_URL}', '${globals.user}', u.profile) AS profile,u.username,u.first_name,u.last_name,u.mobile,u.mobile,u.email,u.is_verified,u.is_private,u.login_status,(SELECT COUNT(pl.id) FROM tbl_post_like pl WHERE p.id = pl.post_id) as like_count FROM tbl_post p
+        JOIN tbl_user u ON p.user_id = u.id 
+        WHERE p.user_id = ${user_id} AND p.is_active = 1 AND p.is_delete = 0`,(error,result)=>{
+    if (!error && result.length > 0) {
+      asyncLoop(result,(likes,next)=>{
+        con.query(`SELECT * FROM tbl_post_like WHERE post_id = ${likes.id} AND user_id = ${follow_id}`,(error,result1)=>{
+            console.log(likes.id);
+            if (!error && result1.length > 0) {
+                likes.post_like = result1
+                next()
+            } else {
+                likes.post_like = []
+                next()
+            }
+        })
+      },()=>{
+        Auth.getsinglereq(follow_id,user_id,(Data)=>{
+            if (Data == false) {
+                callback('0', { keyword: 'somthing went wrong' }, {result:result,request : 0})
+            }else{
+            callback('1', { keyword: "post data" }, {result:result,request : Data});
+        }
+        })
+        // callback("1",{keyword : "all post"},result)
+      })
+    } else {
+        callback('0',{keyword : "something went wrong"},result)
+    }
+})
+     },
 
  
 
-    uservisepost: (follow_id,user_id, callback) => {
-     con.query(`SELECT
-        p.id,u.id as post_user_id,
-       CONCAT('${globals.BASE_URL}', '${globals.user}', u.profile) AS profile,u.username,u.is_private,u.login_status,
-        CONCAT('${globals.BASE_URL}', '${globals.post}', p.image) AS image,
-        (SELECT COUNT(pl.id) FROM tbl_post_like pl WHERE p.id = pl.post_id AND pl.is_like = 1) AS likes,
-        (
-            SELECT
-                CASE
-                    WHEN pl.is_like = 1 THEN 1
-                    ELSE 0
-                END
-            FROM tbl_post_like pl
-            WHERE p.id = pl.post_id AND pl.user_id = ${user_id}
-        ) AS post_like
-    FROM
-        tbl_post p
-    LEFT JOIN tbl_post_like pl ON p.id = pl.post_id
-    LEFT JOIN tbl_user u ON pl.user_id = u.id
-    WHERE p.user_id = ${user_id}
-    GROUP BY p.id ORDER BY p.created_at DESC;`, (error, result) => {
-        console.log("error",result);
-            if (!error && result.length > 0) {
-                Auth.getsinglereq(follow_id,user_id,(Data)=>{
-                    if (Data == false) {
-                        callback('0', { keyword: 'somthing went wrong' }, {result:result,request : 0})
-                    }else{
-                    callback('1', { keyword: "post data" }, {result:result,request : Data});
-                }
-               })
-            } else {
-                callback('0', { keyword: 'somthing went wrong' }, {})
-            }
-        })
-    },
+    // uservisepost: (follow_id,user_id, callback) => {
+    //  con.query(`SELECT
+    //     p.id,u.id as post_user_id,
+    //    CONCAT('${globals.BASE_URL}', '${globals.user}', u.profile) AS profile,u.username,u.is_private,u.login_status,
+    //     CONCAT('${globals.BASE_URL}', '${globals.post}', p.image) AS image,
+    //     (SELECT COUNT(pl.id) FROM tbl_post_like pl WHERE p.id = pl.post_id AND pl.is_like = 1) AS likes,
+    //     (
+    //         SELECT
+    //             CASE
+    //                 WHEN pl.is_like = 1 THEN 1
+    //                 ELSE 0
+    //             END
+    //         FROM tbl_post_like pl
+    //         WHERE p.id = pl.post_id AND pl.user_id = ${user_id}
+    //     ) AS post_like
+    // FROM
+    //     tbl_post p
+    // LEFT JOIN tbl_post_like pl ON p.id = pl.post_id
+    // LEFT JOIN tbl_user u ON pl.user_id = u.id
+    // WHERE p.user_id = ${user_id}
+    // GROUP BY p.id ORDER BY p.created_at DESC;`, (error, result) => {
+    //     console.log("error",result);
+    //         if (!error && result.length > 0) {
+    //             Auth.getsinglereq(follow_id,user_id,(Data)=>{
+    //                 if (Data == false) {
+    //                     callback('0', { keyword: 'somthing went wrong' }, {result:result,request : 0})
+    //                 }else{
+    //                 callback('1', { keyword: "post data" }, {result:result,request : Data});
+    //             }
+    //            })
+    //         } else {
+    //             callback('0', { keyword: 'somthing went wrong' }, {})
+    //         }
+    //     })
+    // },
 
     myprofilepost: (user_id, callback) => {
         con.query(`SELECT
@@ -238,7 +269,7 @@ var Auth = {
                 })
             } else {
                 if (data[0].is_like == 1) {
-                    con.query(`UPDATE tbl_post_like SET is_like = 0 WHERE post_id =? AND user_id = ?`, [post_id, user_id], (error, result) => {
+                    con.query(`DELETE FROM tbl_post_like WHERE post_id = ? AND user_id = ?`, [post_id, user_id], (error, result) => {
                         if (!error) {
                             Auth.like(post_id, user_id, (likeData) => {
                                 callback('1', { keyword: "post delete" }, likeData);
@@ -249,17 +280,6 @@ var Auth = {
                     })
                 }
 
-                if (data[0].is_like == 0) {
-                    con.query(`UPDATE tbl_post_like SET is_like = 1 WHERE post_id =? AND user_id = ?`, [post_id, user_id], (error, result) => {
-                        if (!error) {
-                            Auth.like(post_id, user_id, (likeData) => {
-                                callback('1', { keyword: "post delete" }, likeData);
-                            })
-                        } else {
-                            callback('0', { keyword: "something went wrong" }, {});
-                        }
-                    })
-                }
 
             }
         })
@@ -422,7 +442,33 @@ var Auth = {
             callback(false)
            }
         })
-     }
+     },
+
+//      Testing : (user_id,callback) =>{
+//         con.query(`SELECT p.id,p.user_id,CONCAT('${globals.BASE_URL}', '${globals.post}', p.image) AS image,p.description,p.created_at,p.updated_at, CONCAT('${globals.BASE_URL}', '${globals.user}', u.profile) AS profile,u.username,u.first_name,u.last_name,u.mobile,u.mobile,u.email,u.is_verified,u.is_private,u.login_status FROM tbl_post p
+//         JOIN tbl_user u ON p.user_id = u.id 
+//         JOIN tbl_request r ON p.user_id = r.user_id 
+//         WHERE r.follow_id = ${user_id} AND r.status = "Accepted" AND (p.is_active = 1 AND p.is_delete = 0)`,(error,result)=>{
+//     if (!error && result.length > 0) {
+//       asyncLoop(result,(likes,next)=>{
+//         con.query(`SELECT * FROM tbl_post_like WHERE post_id = ${likes.id} AND user_id = ${user_id}`,(error,result1)=>{
+//             console.log(likes.id);
+//             if (!error && result1.length > 0) {
+//                 likes.post_like = result1
+//                 next()
+//             } else {
+//                 likes.post_like = []
+//                 next()
+//             }
+//         })
+//       },()=>{
+//         callback("1",{keyword : "all post"},result)
+//       })
+//     } else {
+//         callback('0',{keyword : "something went wrong"},result)
+//     }
+// })
+//      }
 
      
 

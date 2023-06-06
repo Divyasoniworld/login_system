@@ -69,11 +69,21 @@ router.get('/allposts',(req,res)=>{
 
  var user_id = req.user_id
     //  middleware.decryption(req.body,(request)=>{
-            Auth.allpost(req,user_id,(code,message,data) => {
+            Auth.allpost(user_id,(code,message,data) => {
                 middleware.sendResponse(req, res, code, message ,data)
             })
 
 })
+
+router.get('/testing',(req,res)=>{
+
+    var user_id = req.user_id
+       //  middleware.decryption(req.body,(request)=>{
+               Auth.Testing(user_id,(code,message,data) => {
+                   middleware.sendResponse(req, res, code, message ,data)
+               })
+   
+   })
 
 router.get('/myprofile',(req,res)=>{
 

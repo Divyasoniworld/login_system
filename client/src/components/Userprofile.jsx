@@ -80,7 +80,7 @@ function UserProfile() {
         }
       })
       .then((response) => {
-
+       console.log(posts);
         if (response.data.data.result[0].is_private == 0) {
           setPosts(response.data.data.result)
         } else {
@@ -116,7 +116,6 @@ function UserProfile() {
         }
       })
       .then((response) => {
-        console.log(response.data.data);
         setFollowers(response.data.data[0])
       })
       .catch((error) => {
@@ -279,7 +278,7 @@ function UserProfile() {
               <div key={key} className="col-md-3 mt-4">
                 <img src={post.image} alt='' width={'60%'} height={'90%'} />
                 <div className="footer">
-                  {(post.likes > 0) ? post.likes : ""} {(post.post_like == 1) ? <AiFillHeart style={{ color: "red", cursor: "pointer" }} onClick={() => { handleLike(post.id) }} size={35} /> : <AiOutlineHeart style={{ cursor: "pointer" }} onClick={() => { handleLike(post.id) }} size={35} />}
+                  {(post.like_count > 0) ? post.like_count : ""} {(post.post_like.length > 0) ? <AiFillHeart style={{ color: "red", cursor: "pointer" }} onClick={() => { handleLike(post.id) }} size={35} /> : <AiOutlineHeart style={{ cursor: "pointer" }} onClick={() => { handleLike(post.id) }} size={35} />}
                   <AiOutlineComment size={30} />
                   <AiOutlineShareAlt size={30} />
                 </div>
