@@ -8,23 +8,12 @@ import swal from 'sweetalert';
 import axios from 'axios'
 
 
-
-
-
-
 function Home() {
 
-    var follow = `Follow +`;
-
-    const handlefollow = (follow_id) => {
-        alert(`follow postId : ${follow_id}`)
-    }
-
+ 
     const params = useParams();
-    // console.log("param",params)
 
     var UserId = localStorage.getItem('UserId')
-
 
     const [postData,setPostData] = useState([]) 
     const [refresh, setRefresh] = useState()
@@ -109,6 +98,7 @@ const handleLike = (id) => {
                             </div> 
                             <div className="card-body">
                                 <img style={{width:'50%'}} src={post.image} alt='' />
+                                <div className='description'>{post.description}</div>
                             </div>
                             <div className="card-footer ">
                             

@@ -154,6 +154,17 @@ router.get('/getreqdata',(req,res)=>{
 
 })
 
+router.get('/chat_inbox',(req,res)=>{
+
+    // var follow_id = req.params.follow_id;
+    var user_id = req.user_id;
+    //  middleware.decryption(req.body,(request)=>{
+            Auth.message_inbox(user_id,(code,message,data) => {
+                middleware.sendResponse(req, res, code, message ,data)
+            })
+
+})
+
 router.post('/requestConfirm',(req,res)=>{
 
           var follow_id = req.user_id;

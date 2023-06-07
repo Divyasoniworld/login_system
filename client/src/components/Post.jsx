@@ -51,7 +51,7 @@ console.log('response' , response);
     <div className="main_container">
         <div className='text-dark h4'>Create Post</div>
         <form encType= 'multipart/form-data' method='post'>
-            <input type='file' onChange={(e)=>{setSelectedFile(e.target.files[0])}} id='post' accept='image/*' />
+            <input type='file' onChange={(e)=>{setSelectedFile(e.target.files[0])}} id='post' />
             <input type='text' name='description' onClick={(e)=>{setDescription(e.target.value)}} id='description' placeholder='say somthing...' />
             <button onClick={handlesubmit} className='ms-2' type='submit'>Post</button>
         </form>

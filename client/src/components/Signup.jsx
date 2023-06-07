@@ -11,6 +11,7 @@ function Signup() {
     const [selectedFile, setSelectedFile] = useState(null);
     const [first_name,setFirst_name] = useState('');
     const [last_name,setLast_name] = useState('');
+    const [username,setUsername] = useState('');
     const [mobile,setMobile] = useState('');
     const [email,setEmail] = useState('');
     const [password,setPassword] = useState('');
@@ -39,16 +40,20 @@ function Signup() {
       formData.append('profile', selectedFile);
       formData.append('first_name', first_name);
       formData.append('last_name', last_name);
+      formData.append('username', username);
       formData.append('mobile', mobile);
       formData.append('email', email);
       formData.append('password', password);
   
       axios.post('http://localhost:9595/api/v1/auth/signup', formData)
         .then((response) => {
-          if (response.data.message) {
-                setError(response.data.message)
+          console.log("error",response.data.massage);
+          if (response.data.massage) {
+                setError(response.data.massage)
+                if (response.data.code == 1) {
+                  navigate('/login')
+                }
               } else {
-                console.log(formData);
                 navigate('/login')
               }
         })
@@ -77,6 +82,9 @@ function Signup() {
         </div>
         <div className="form-group">
         	<input type="text" className="form-control" name="last_name" onChange={(e)=>{setLast_name(e.target.value)}} placeholder="Last Name" required="required" />
+        </div>
+        <div className="form-group">
+        	<input type="text" className="form-control" name="username" onChange={(e)=>{setUsername(e.target.value)}} placeholder="Username" required="required" />
         </div>
         <div className="form-group">
         	<input type="tel" className="form-control" name="mobile" onChange={(e)=>{setMobile(e.target.value)}} placeholder="Mobile" required="required" />

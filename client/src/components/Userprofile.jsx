@@ -13,7 +13,7 @@ function UserProfile() {
   const token = localStorage.getItem('token')
   const follow_id = localStorage.getItem('UserId')
   const [posts, setPosts] = useState([]);
-  const [likeData, setLikeData] = useState([])
+  // const [likeData, setLikeData] = useState([])
   const [reqData, setReqData] = useState({})
   const [refresh, setRefresh] = useState()
   const [followers, setFollowers] = useState(0);
@@ -183,30 +183,30 @@ function UserProfile() {
       });
   };
 
-  const handleLike = (id) => {
-    let config = {
-      method: 'post',
-      maxBodyLength: Infinity,
-      url: `http://localhost:9595/api/v1/userpostlike`,
-      headers: {
-        'api-key': 'XnOBHi0M9hkUAI2RWa7J6zZn5NsEm1ofrZy5uVybFTw=XnOBHi0M9hkUAI2RWa7J6zZn5NsEm1ofrZy5uVybFTw=',
-        'token': `${token}`,
-        'Content-Type': 'application/json',
-        'id': `${id}`,
-        'user_id': `${params.id}`
-      },
-    };
+  // const handleLike = (id) => {
+  //   let config = {
+  //     method: 'post',
+  //     maxBodyLength: Infinity,
+  //     url: `http://localhost:9595/api/v1/userpostlike`,
+  //     headers: {
+  //       'api-key': 'XnOBHi0M9hkUAI2RWa7J6zZn5NsEm1ofrZy5uVybFTw=XnOBHi0M9hkUAI2RWa7J6zZn5NsEm1ofrZy5uVybFTw=',
+  //       'token': `${token}`,
+  //       'Content-Type': 'application/json',
+  //       'id': `${id}`,
+  //       'user_id': `${params.id}`
+  //     },
+  //   };
 
-    axios.request(config)
-      .then((response) => {
-        setLikeData(response.data.data[0])
+  //   axios.request(config)
+  //     .then((response) => {
+  //       setLikeData(response.data.data[0])
 
-        setRefresh(!refresh)
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
+  //       setRefresh(!refresh)
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     });
+  // }
 
 
   var verified;
@@ -278,11 +278,12 @@ function UserProfile() {
             return (
               <div key={key} className="col-md-3 mt-4">
                 <img src={post.image} alt='' width={'60%'} height={'90%'} />
-                <div className="footer">
-                  {(post.like_count > 0) ? post.like_count : ""} {(post.post_like.length > 0) ? <AiFillHeart style={{ color: "red", cursor: "pointer" }} onClick={() => { handleLike(post.id) }} size={35} /> : <AiOutlineHeart style={{ cursor: "pointer" }} onClick={() => { handleLike(post.id) }} size={35} />}
-                  <AiOutlineComment size={30} />
-                  <AiOutlineShareAlt size={30} />
-                </div>
+               
+                  {/* <div className="footer">
+                    {(post.like_count > 0) ? post.like_count : ""} {(post.post_like.length > 0) ? <AiFillHeart style={{ color: "red", cursor: "pointer" }} onClick={() => { handleLike(post.id) }} size={35} /> : <AiOutlineHeart style={{ cursor: "pointer" }} onClick={() => { handleLike(post.id) }} size={35} />}
+                    <AiOutlineComment size={30} />
+                    <AiOutlineShareAlt size={30} />
+                  </div> */}
               </div>
             )
           }) : message }

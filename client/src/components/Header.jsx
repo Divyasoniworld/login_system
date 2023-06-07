@@ -5,6 +5,7 @@ import {BiLogOut,BiUserCheck} from "react-icons/bi"
 import {AiOutlineMessage} from "react-icons/ai"
 import {BsSearchHeart} from "react-icons/bs"
 import {IoIosCreate} from "react-icons/io"
+import { VscVerifiedFilled } from 'react-icons/vsc'
 import axios from 'axios';
 import swal from 'sweetalert'
 
@@ -107,6 +108,15 @@ if (userData.role == 'user') {
 <Link to={'/home/request'} style={{textDecoration:"none",color:"black"}}>Requests <span class="badge rounded-pill badge-notification bg-danger">{requestData.length > 0 ? requestData.length : ''}</span> <BiUserCheck size={25}/></Link>
  </div> 
  }
+
+
+ var verified;
+
+ if (userData.is_verified == 1) {
+   verified = <VscVerifiedFilled style={{ marginTop: '2px' }} size={20} color='#0095F6' />
+ } else {
+   verified = ''
+ }
   
 
 
@@ -116,7 +126,7 @@ if (userData.role == 'user') {
   <div className="container-fluid">
     <div className="navbar-brand d-flex">
     <Link to={'/home/posts'}> <img src= {userData.profile} alt='' width="60" height="60" className="d-inline-block align-text-top rounded-circle"/></Link>
-      <Link to={'/home/profile'} className='mt-3 ms-2' style={{textDecoration:"none",color:"black"}}>{userData.first_name} {userData.last_name}</Link>
+      <Link to={'/home/profile'} className='mt-3 ms-2' style={{textDecoration:"none",color:"black"}}>{userData.first_name} {userData.last_name} {verified}</Link>
       {/* <h5 className='mt-3 ms-2' >{userData.first_name} {userData.last_name}</h5> */}
     </div>
     {/* <div style={{cursor:"pointer"}} className="navbar-brand d-flex">

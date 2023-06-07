@@ -15,11 +15,12 @@ var Auth = {
         Auth.checkemu(request,(response)=>{
             if (request.email == response.email) {
                 callback('0',{keyword:'rest_keyword_unique_email'},{})
-                
+            }else if(request.username == response.username){
+                callback('0',{keyword:'username is already used'},{})
             }else if(request.mobile == response.mobile){
                 callback('0',{keyword:'rest_keyword_unique_mobile'},{})
-            } 
-            else {
+            } else {
+
                 var password;
                 middleware.encryption(request.password,(response)=>{
                     password = response
@@ -28,6 +29,7 @@ var Auth = {
                     profile: req.file.filename,
                     first_name: request.first_name,
                     last_name: request.last_name,
+                    username : request.username,
                     mobile: request.mobile,
                     email: request.email,
                     password: password,
@@ -36,6 +38,7 @@ var Auth = {
                 }
                 con.query(`INSERT INTO tbl_user SET ?`,[userdata],(error,result)=>{
                     if (!error) {
+                      
                          var user_id = result.insertId;
                                 Auth.getuserdetails(user_id,(userdata)=>{
                                     if (userdata == null) {
@@ -47,7 +50,11 @@ var Auth = {
                                             if (userdata == null) {
                                                 callback('2',{keyword:'rest_keyword_user_null'},{})
                                             } else {
-                                                callback('1',{keyword:'rest_keyword_user_signup'},userdata)
+                                                emailtemplate.verification(1234,(verification)=>{
+                                                    comman.sendmail(userdata.email,'Email Verification',verification,(is_sent)=>{
+                                                        callback('1',{keyword:'rest_keyword_user_signup'},userdata)
+                                                    })
+                                                })
                                             }
                                         })
                                     })
@@ -424,7 +431,7 @@ following : (user_id,callback) => {
     },
 
     checkemu: (request, callback) => {
-        con.query(`SELECT * FROM tbl_user WHERE email = ? OR mobile = ? AND is_active = '1' AND is_delete = '0'`, [request.email,request.mobile,request.username], (error, result)=> {
+        con.query(`SELECT * FROM tbl_user WHERE email = ? OR mobile = ? OR username = ? AND is_active = '1' AND is_delete = '0'`, [request.email,request.mobile,request.username], (error, result)=> {
             if (!error && result.length > 0) {
                 callback(result[0]);
             }else{

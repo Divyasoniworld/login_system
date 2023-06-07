@@ -13,6 +13,7 @@ import Myprofile from './components/Myprofile';
 import Messages from './components/Messages';
 import Search from './components/Search';
 import UserProfile from './components/Userprofile';
+import Chatbox from './components/Chatbox';
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -31,6 +32,7 @@ root.render(
    <Route exact path="/findone/:id" element={<UserProfile />} />
    <Route exact path="/messages" element={<Messages />} />
    <Route exact path="/findone" element={<Search />} />
+   <Route exact path="/chat/:id" element={<Chatbox />} />
 </Routes>
   </BrowserRouter>
 );
