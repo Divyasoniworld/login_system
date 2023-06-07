@@ -165,6 +165,29 @@ router.get('/chat_inbox',(req,res)=>{
 
 })
 
+router.get('/chat/:id',(req,res)=>{
+
+    var message_id = req.params.id;
+    var user_id = req.user_id;
+    //  middleware.decryption(req.body,(request)=>{
+            Auth.chat(user_id,message_id,(code,message,data) => {
+                middleware.sendResponse(req, res, code, message ,data)
+            })
+
+})
+
+router.post('/singlemessage/:id',(req,res)=>{
+
+    var message_id = req.params.id;
+    var user_id = req.user_id;
+    console.log("message",message_id);
+    //  middleware.decryption(req.body,(request)=>{
+            Auth.singlemessage(req,user_id,message_id,(code,message,data) => {
+                middleware.sendResponse(req, res, code, message ,data)
+            })
+
+})
+
 router.post('/requestConfirm',(req,res)=>{
 
           var follow_id = req.user_id;

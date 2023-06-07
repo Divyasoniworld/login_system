@@ -1,0 +1,74 @@
+.message-page {
+  display: flex;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+.message-list {
+  flex: 3;
+  background-color: #f0f0f0;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  max-width: 80%;
+}
+
+.message.sent {
+  align-self: flex-end;
+  width: inherit;
+  background-color: #007bff;
+  color: #fff;
+}
+
+.message.received {
+  align-self: flex-start;
+  width: inherit;
+  background-color: #fff;
+  color: #333;
+}
+
+.message-content {
+  font-size: 14px;
+}
+
+.message-sender {
+  font-size: 12px;
+  color: #777;
+  margin-top: 5px;
+}
+
+.message-reply {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 20px;
+}
+
+.message-reply form {
+  display: flex;
+  flex: 1;
+}
+
+.message-reply input[type='text'] {
+  flex: 1;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 15px;
+  margin-right: 10px;
+}
+
+.message-reply button[type='submit'] {
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+}

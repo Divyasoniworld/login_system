@@ -468,10 +468,10 @@ var Auth = {
      },
 
      message_inbox : (user_id,callback)=>{
-        con.query(`SELECT m.id,m.user_id,m.message_id,CAST(m.message AS CHAR(10000) CHARACTER SET utf8) as message,CONCAT('${globals.BASE_URL}', '${globals.user}', u.profile) AS profile,u.username,u.first_name,u.last_name,u.mobile,u.email,m.created_at,DATE_FORMAT(m.updated_at,'%H:%i %p') as updated_at 
+        con.query(`SELECT m.id,m.user_id,m.message_id,CAST(m.message AS CHAR(10000) CHARACTER SET utf8) as message,CONCAT('${globals.BASE_URL}', '${globals.user}', u.profile) AS profile,u.username,u.first_name,u.last_name,u.mobile,u.email,m.created_at,DATE_FORMAT(m.updated_at,'%h:%i %p') as updated_at 
         FROM tbl_messages m
         JOIN tbl_user u ON m.message_id = u.id
-        WHERE user_id = ? AND m.is_active = 1 AND m.is_delete = 0;`,[user_id],(error,result)=>{
+        WHERE user_id = ? AND m.is_active = 1 AND m.is_delete = 0  GROUP BY m.user_id;`,[user_id],(error,result)=>{
             console.log(user_id);
             if (!error && result.length > 0) {
                 callback('1',{keyword : "message inbox"},result)
@@ -479,7 +479,38 @@ var Auth = {
                 callback('0',{keyword : "something went wrong"},{})
             }
         })
-     }
+     },
+
+     chat : (user_id,message_id,callback)=>{
+      con.query(`SELECT m.id,m.user_id,m.message_id,CAST(m.message AS CHAR(10000) CHARACTER SET utf8) as message,CONCAT('${globals.BASE_URL}', '${globals.user}', u.profile) AS profile,u.username,u.first_name,u.last_name,u.mobile,u.email,m.updated_at,DATE_FORMAT(m.created_at,'%h:%i %p') as created_at 
+        FROM tbl_messages m
+        JOIN tbl_user u ON m.user_id = u.id
+        WHERE ((m.user_id = ${user_id} AND m.message_id = ${message_id}) OR (m.user_id = ${message_id} AND m.message_id = ${user_id})) AND m.is_active = 1 AND m.is_delete = 0 ORDER BY m.created_at ASC;`,(error,result)=>{
+            if (!error && result.length > 0) {
+                callback('1',{keyword : "message inbox"},result)
+            } else {
+                callback('0',{keyword : "something went wrong"},{})
+            }
+        })
+     },
+
+     singlemessage : (req,user_id,message_id,callback)=>{
+        var messageData = {
+            user_id : user_id,
+            message_id : message_id,
+            message : req.body.message
+
+        }
+        con.query(`INSERT INTO tbl_messages SET ?`,[messageData],(error,result)=>{
+            console.log(error);
+              if (!error && result.length > 0) {
+                  callback('1',{keyword : "message inbox"},result)
+              } else {
+                  callback('0',{keyword : "something went wrong"},{})
+              }
+          })
+       }
+  
 
 //      Testing : (user_id,callback) =>{
 //         con.query(`SELECT p.id,p.user_id,CONCAT('${globals.BASE_URL}', '${globals.post}', p.image) AS image,p.description,p.created_at,p.updated_at, CONCAT('${globals.BASE_URL}', '${globals.user}', u.profile) AS profile,u.username,u.first_name,u.last_name,u.mobile,u.mobile,u.email,u.is_verified,u.is_private,u.login_status FROM tbl_post p
