@@ -64,7 +64,7 @@ const Chatbox = () => {
   return (
     <div className="message-page">
       <div className="message-list">
-        {messages.map((message, index) => (
+        {messages.length > 0 ? messages.map((message, index) => (
           <div key={index} className="message-data w-100 d-flex gap-1">
             <img
               className="rounded-circle"
@@ -78,7 +78,7 @@ const Chatbox = () => {
               <small className="message-time d-flex justify-content-end">{message.created_at}</small>
             </div>
           </div>
-        ))}
+        )) : 'No chat yet'}
       </div>
       <div className="message-reply">
         <form onSubmit={handleReplySubmit} method="post">

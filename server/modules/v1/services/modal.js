@@ -468,11 +468,43 @@ var Auth = {
      },
 
      message_inbox : (user_id,callback)=>{
-        con.query(`SELECT m.id,m.user_id,m.message_id,CAST(m.message AS CHAR(10000) CHARACTER SET utf8) as message,CONCAT('${globals.BASE_URL}', '${globals.user}', u.profile) AS profile,u.username,u.first_name,u.last_name,u.mobile,u.email,m.created_at,DATE_FORMAT(m.updated_at,'%h:%i %p') as updated_at 
-        FROM tbl_messages m
-        JOIN tbl_user u ON m.message_id = u.id
-        WHERE user_id = ? AND m.is_active = 1 AND m.is_delete = 0  GROUP BY m.user_id;`,[user_id],(error,result)=>{
-            console.log(user_id);
+       con.query(`SELECT
+       m.id,
+       m.user_id,
+       m.message_id,
+       m.message,
+       CONCAT('${globals.BASE_URL}','${globals.user}', sender.profile) AS profile,
+       sender.username AS username,
+       sender.first_name AS first_name,
+       sender.last_name AS last_name,
+       m.created_at,
+       DATE_FORMAT(m.updated_at, '%h:%i %p') AS updated_at
+   FROM
+       tbl_messages m
+   JOIN
+       tbl_user sender ON m.user_id = sender.id
+   WHERE
+       m.message_id = ${user_id}
+   
+   UNION
+   
+   SELECT
+       m.id,
+       m.user_id,
+       m.message_id,
+       m.message,
+       CONCAT('${globals.BASE_URL}','${globals.user}', receiver.profile) AS profile,
+       receiver.username AS username,
+       receiver.first_name AS first_name,
+       receiver.last_name AS last_name,
+       m.created_at,
+       DATE_FORMAT(m.updated_at, '%h:%i %p') AS updated_at
+   FROM
+       tbl_messages m
+   JOIN
+       tbl_user receiver ON m.message_id = receiver.id
+   WHERE
+       m.user_id = ${user_id}` ,(error,result)=>{
             if (!error && result.length > 0) {
                 callback('1',{keyword : "message inbox"},result)
             } else {
@@ -482,10 +514,11 @@ var Auth = {
      },
 
      chat : (user_id,message_id,callback)=>{
-      con.query(`SELECT m.id,m.user_id,m.message_id,CAST(m.message AS CHAR(10000) CHARACTER SET utf8) as message,CONCAT('${globals.BASE_URL}', '${globals.user}', u.profile) AS profile,u.username,u.first_name,u.last_name,u.mobile,u.email,m.updated_at,DATE_FORMAT(m.created_at,'%h:%i %p') as created_at 
+    var dev =  con.query(`SELECT m.id,m.user_id,m.message_id,CAST(m.message AS CHAR(10000) CHARACTER SET utf8) as message,CONCAT('${globals.BASE_URL}', '${globals.user}', u.profile) AS profile,u.username,u.first_name,u.last_name,u.mobile,u.email,m.updated_at,DATE_FORMAT(m.created_at,'%h:%i %p') as created_at 
         FROM tbl_messages m
         JOIN tbl_user u ON m.user_id = u.id
         WHERE ((m.user_id = ${user_id} AND m.message_id = ${message_id}) OR (m.user_id = ${message_id} AND m.message_id = ${user_id})) AND m.is_active = 1 AND m.is_delete = 0 ORDER BY m.created_at ASC;`,(error,result)=>{
+            console.log(dev.sql);
             if (!error && result.length > 0) {
                 callback('1',{keyword : "message inbox"},result)
             } else {

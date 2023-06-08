@@ -7,6 +7,8 @@ import Header from './Header'
 function Messages() {
 
 	var token = localStorage.getItem('token');
+	var UserId = localStorage.getItem('UserId');
+
 	const [chatInbox, setChatInbox] = useState([])
 
 	useEffect(()=>{
@@ -44,7 +46,7 @@ function Messages() {
 			<div key={key} className='row'>
 				<div className='d-flex justify align-items-center mt-3 gap-3'>
 					<img src={e.profile} width="60" height="60" className="d-inline-block align-text-top rounded-circle" alt='' />
-					<Link to={`/chat/${e.message_id}`} className='text-decoration-none'> <div className='h5 text-black'>{e.first_name} {e.last_name}</div> </Link>
+					<Link to={ UserId == e.message_id ? `/chat/${e.user_id}` : `/chat/${e.message_id}`} className='text-decoration-none'> <div className='h5 text-black'>{e.first_name} {e.last_name}</div> </Link>
 					<div className='text'>{e.updated_at}</div>
 				</div>
 			</div>

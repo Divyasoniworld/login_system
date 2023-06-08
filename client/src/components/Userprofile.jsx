@@ -4,18 +4,19 @@ import '../css/userprofile.css'
 import { AiOutlineHeart, AiOutlineComment, AiOutlineShareAlt, AiFillHeart } from 'react-icons/ai'
 import {BsPersonFillLock} from 'react-icons/bs'
 import { VscVerifiedFilled } from 'react-icons/vsc'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
 function UserProfile() {
 
   const params = useParams()
+  const navigate = useNavigate()
   const token = localStorage.getItem('token')
   const follow_id = localStorage.getItem('UserId')
   const [posts, setPosts] = useState([]);
   // const [likeData, setLikeData] = useState([])
   const [reqData, setReqData] = useState({})
-  const [refresh, setRefresh] = useState()
+  // const [refresh, setRefresh] = useState()
   const [followers, setFollowers] = useState(0);
   const [following, setFollowing] = useState(0);
   const [postcount, setPostCount] = useState(0);
@@ -261,11 +262,16 @@ function UserProfile() {
                   {reqData.length > 0 ? reqData.map((r,index) => {
                     return (
                       <div key={index} class="d-flex gap-2">
-                        <button id='follow' className='btn btn-secondary' onClick={sendRequest}>{r.status == 'Pending' ? 'Requested' : 'Following'}</button>
+                        <button id='follow' className='btn btn-secondary rounded-pill' onClick={sendRequest}>{r.status == 'Pending' ? 'Requested' : 'Following'}</button>
                       </div>
                     )
-                  }) : <button id='follow' className='btn btn-secondary' onClick={sendRequest}>Follow</button>}
+                  }) : <button id='follow' className='btn btn-secondary rounded-pill' onClick={sendRequest}>Follow</button>}
 
+                </li>
+                <li>
+                  <div class="d-flex gap-2">
+                  <button id='message' className='btn btn-secondary rounded-pill' onClick={()=>{navigate(`/chat/${params.id}`)}}>Message</button>
+                  </div>
                 </li>
               </ul>
             </div>
@@ -278,12 +284,6 @@ function UserProfile() {
             return (
               <div key={key} className="col-md-3 mt-4">
                 <img src={post.image} alt='' width={'60%'} height={'90%'} />
-               
-                  {/* <div className="footer">
-                    {(post.like_count > 0) ? post.like_count : ""} {(post.post_like.length > 0) ? <AiFillHeart style={{ color: "red", cursor: "pointer" }} onClick={() => { handleLike(post.id) }} size={35} /> : <AiOutlineHeart style={{ cursor: "pointer" }} onClick={() => { handleLike(post.id) }} size={35} />}
-                    <AiOutlineComment size={30} />
-                    <AiOutlineShareAlt size={30} />
-                  </div> */}
               </div>
             )
           }) : message }
