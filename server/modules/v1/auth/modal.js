@@ -12,108 +12,139 @@ const { use } = require('./route');
 var Auth = {
 
     signup : (request,req, callback) => {
+        var otp_code = Math.floor(1000 + Math.random() * 9000);
         Auth.checkemu(request,(response)=>{
-            if (request.email == response.email) {
-                callback('0',{keyword:'rest_keyword_unique_email'},{})
-            }else if(request.username == response.username){
-                callback('0',{keyword:'username is already used'},{})
-            }else if(request.mobile == response.mobile){
-                callback('0',{keyword:'rest_keyword_unique_mobile'},{})
-            } else {
-
-                var password;
-                middleware.encryption(request.password,(response)=>{
-                    password = response
-                })
-                var userdata = {
-                    profile: req.file.filename,
-                    first_name: request.first_name,
-                    last_name: request.last_name,
-                    username : request.username,
-                    mobile: request.mobile,
-                    email: request.email,
-                    password: password,
-                    role : "user"
-
-                }
-                con.query(`INSERT INTO tbl_user SET ?`,[userdata],(error,result)=>{
-                    if (!error) {
-                      
-                         var user_id = result.insertId;
-                                Auth.getuserdetails(user_id,(userdata)=>{
-                                    if (userdata == null) {
-                                        callback('2',{keyword:'rest_keyword_user_null'},{})
-                                   } else {
-                                    common.checkUpdateToken(user_id,request,(token)=>{
+            if (response) {
+                if (response.email_verify == 0) {
+                    con.query(`UPDATE tbl_user SET otp_code = ${otp_code} WHERE id = ${response.id}`,(error,result)=>{
+                       if (!error) {
+                        emailtemplate.verification(otp_code,(verification)=>{
+                            comman.sendmail(response.email,'Email Verification',verification,(is_sent)=>{
+                                callback('1',{keyword:'otp sent in your email'},otp_code)
+                            })
+                        })
+                       } else {
+                        callback('0',{keyword : "otp not sent your email"},{})
+                       } 
+                    })
+    
+                    } else {
+    
+                        if (request.email == response.email) {
+                            callback('0',{keyword:'rest_keyword_unique_email'},{})
+                        }else if(request.username == response.username){
+                            callback('0',{keyword:'username is already used'},{})
+                        }else if(request.mobile == response.mobile){
+                            callback('0',{keyword:'rest_keyword_unique_mobile'},{})
+                        } else {
+    
+                        var password;
+                        middleware.encryption(request.password,(response)=>{
+                            password = response
+                        })
+                        var userdata = {
+                            profile: req.file.filename,
+                            first_name: request.first_name,
+                            last_name: request.last_name,
+                            username : request.username,
+                            mobile: request.mobile,
+                            email: request.email,
+                            password: password,
+                            otp_code : otp_code,
+                            role : "user"
+        
+                        }
+                        con.query(`INSERT INTO tbl_user SET ?`,[userdata],(error,result)=>{
+                            console.log(error);
+                            if (!error) {
+                              
+                                 var user_id = result.insertId;
                                         Auth.getuserdetails(user_id,(userdata)=>{
-                                            userdata.token = token;
                                             if (userdata == null) {
                                                 callback('2',{keyword:'rest_keyword_user_null'},{})
-                                            } else {
-                                                emailtemplate.verification(1234,(verification)=>{
-                                                    comman.sendmail(userdata.email,'Email Verification',verification,(is_sent)=>{
-                                                        callback('1',{keyword:'rest_keyword_user_signup'},userdata)
-                                                    })
+                                           } else {
+                                            common.checkUpdateToken(user_id,request,(token)=>{
+                                                Auth.getuserdetails(user_id,(userdata)=>{
+                                                    userdata.token = token;
+                                                    if (userdata == null) {
+                                                        callback('2',{keyword:'rest_keyword_user_null'},{})
+                                                    } else {
+                                                        emailtemplate.verification(1234,(verification)=>{
+                                                            comman.sendmail(userdata.email,'Email Verification',verification,(is_sent)=>{
+                                                                callback('1',{keyword:'rest_keyword_user_signup'},userdata)
+                                                            })
+                                                        })
+                                                    }
                                                 })
+                                            })
                                             }
-                                        })
-                                    })
-                                    }
-                                });
-                       
-                    } else {
-                        callback('0',{keyword:'rest_keyword_error_message'},{})
+                                        });
+                               
+                            } else {
+                                callback('0',{keyword:'rest_keyword_error_message'},{})
+                            }
+                        })
                     }
-                })
-            };
+    
+                  
+                };
+            } else {
+                callback('2',{keyword : "data not found"},{})
+            }
+           
         });
 
     },
 
     login : (request, callback) =>{
        Auth.checkemu(request,(response)=>{
-        if (request.email == response.email) {
-            con.query(`SELECT * FROM tbl_user WHERE email = ? AND is_active = '1' AND is_delete = '0'`,[request.email],(error,result)=>{
-                if (!error && result.length > 0) {
-                    var cpassword;
-                    middleware.encryption(request.password,(response)=>{
-                        cpassword = response
-                    }) 
-    
-                    if (cpassword == result[0].password) {
-                        Auth.getuserdetails(result[0].id,(userdata)=>{
-                            if (userdata == null) {
-                                callback('2',{keyword:'Please create account first'},{})
-                            } else {
+        if (response.email_verify == 0) {
+            callback('0',{keyword : "Email is Not Verify"})
+        } else {
+            if (request.email == response.email) {
+                con.query(`SELECT * FROM tbl_user WHERE email = ? AND is_active = '1' AND is_delete = '0'`,[request.email],(error,result)=>{
+                    if (!error && result.length > 0) {
+                        var cpassword;
+                        middleware.encryption(request.password,(response)=>{
+                            cpassword = response
+                        }) 
         
-                                var update_status = {
-                                    login_status : 'Online',
-                                    logged_in_time : new Date()
-                                }
-                                con.query(`UPDATE tbl_user SET ? WHERE id = ?`,[update_status,result[0].id],(error,response)=>{
-                                    comman.checkUpdateToken(result[0].id,request,(token)=>{
-                                        userdata.token = token
-                                        Auth.getuserdetails(result[0].id,(userdata)=>{
-                                            if (userdata == null) {
-                                                callback('2',{keyword:'rest_keyword_user_null'},{})
-                                            } else {
-                                                callback('1',{keyword:'rest_keyword_user_login'},userdata)
-                                            }
+                        if (cpassword == result[0].password) {
+                            Auth.getuserdetails(result[0].id,(userdata)=>{
+                                if (userdata == null) {
+                                    callback('2',{keyword:'Please create account first'},{})
+                                } else {
+            
+                                    var update_status = {
+                                        login_status : 'Online',
+                                        logged_in_time : new Date()
+                                    }
+                                    con.query(`UPDATE tbl_user SET ? WHERE id = ?`,[update_status,result[0].id],(error,response)=>{
+                                        comman.checkUpdateToken(result[0].id,request,(token)=>{
+                                            userdata.token = token
+                                            Auth.getuserdetails(result[0].id,(userdata)=>{
+                                                if (userdata == null) {
+                                                    callback('2',{keyword:'rest_keyword_user_null'},{})
+                                                } else {
+                                                    callback('1',{keyword:'rest_keyword_user_login'},userdata)
+                                                }
+                                            })
                                         })
                                     })
-                                })
-                                
-                            }
-                        })
+                                    
+                                }
+                            })
+                        } else {
+                        callback('0',{keyword:'Enter valid password'},{})
+                        }
                     } else {
-                    callback('0',{keyword:'Enter valid password'},{})
-                    }
-                } else {
-                    callback('0',{keyword:'rest_keyword_error_message'},{})}
-            })
-        } else {
-            callback('0',{keyword:'Enter valid email'},{})
+                        callback('0',{keyword:'rest_keyword_error_message'},{})}
+                })
+            } else {
+                callback('0',{keyword:'Enter valid email'},{})
+            }
         }
+       
        })
 
     },
@@ -215,6 +246,53 @@ following : (user_id,callback) => {
 
     });
     
+},
+
+EmailVerify : (req,callback) =>{
+  Auth.getuserdetails(req.user_id,(userData)=>{
+    if (userData.otp_code == req.body.otp_code) {
+        var verify = {
+            id : req.user_id,
+            email_verify : 1
+        }
+        con.query(`UPDATE tbl_user SET ?`,[verify],(error,result)=>{
+            if (!error) {
+                callback('1',{keyword : "Email verify successfully"},userData);
+            } else {
+               callback('0',{keyword : "something went wrong"},{}); 
+            }
+        })
+    } else {
+        callback('0',{keyword : "Enter Valid OTP"},{});
+    }
+  })
+},
+
+ResendEmailOtp : (req,callback) => {
+    var otp_code = Math.floor(1000 + Math.random() * 9000);
+  Auth.getuserdetails(req.user_id,(userData)=>{
+    if (userData.email_verify == 1) {
+        callback('0',{keyword : "email is already verified"})
+    } else {
+        emailtemplate.verification(otp_code,(verification)=>{
+            comman.sendmail(userData.email,'Email Verification',verification,(is_sent)=>{
+                var EmailVerify = {
+                    id : req.user_id,
+                    otp_sent_time : new Date(),
+                    otp_code : otp_code
+                }
+                con.query(`UPDATE tbl_user SET ?`,[EmailVerify],(error,result)=>{
+                    if (!error) {
+                        callback('1',{keyword : "email verified"},1)
+                    } else {
+                        callback('0',{keyword : "something went wrong"},{})
+                    }
+                })
+            })
+        })
+       
+    }
+  })
 },
 
     // update_user : (request,user_id, callback) => {
@@ -441,7 +519,7 @@ following : (user_id,callback) => {
     },
 
     getuserdetails : (user_id, callback) => {
-        con.query(`SELECT u.id,u.role,u.first_name,u.last_name,concat('${globals.BASE_URL}','${globals.user}',u.profile) as profile,u.email,u.password,u.mobile,u.login_status,DATE_FORMAT(u.logged_in_time,'%d %M, %Y') as login_time,u.is_forgot,u.forgot_time,ifnull(di.token,'') as token,ifnull(di.device_type,'') as device_type,ifnull(di.device_token,'') as device_token FROM tbl_user u
+        con.query(`SELECT u.id,u.role,u.first_name,u.last_name,concat('${globals.BASE_URL}','${globals.user}',u.profile) as profile,u.email,u.password,u.mobile,u.is_verified,u.is_private,u.email_verify,u.otp_code,u.otp_sent_time,u.login_status,DATE_FORMAT(u.logged_in_time,'%d %M, %Y') as login_time,u.is_forgot,u.forgot_time,ifnull(di.token,'') as token,ifnull(di.device_type,'') as device_type,ifnull(di.device_token,'') as device_token FROM tbl_user u
         LEFT JOIN tbl_device_info di ON di.user_id = u.id
         WHERE u.id = ? AND u.is_active = 1 AND u.is_delete = '0';`,[user_id],(error,result) => {
             var userdata = result[0];

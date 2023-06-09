@@ -14,6 +14,7 @@ import Messages from './components/Messages';
 import Search from './components/Search';
 import UserProfile from './components/Userprofile';
 import Chatbox from './components/Chatbox';
+import Email_verify from './components/Email_verifucation';
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -33,6 +34,7 @@ root.render(
    <Route exact path="/messages" element={<Messages />} />
    <Route exact path="/findone" element={<Search />} />
    <Route exact path="/chat/:id" element={<Chatbox />} />
+   <Route exact path="/email_verify" element={<Email_verify />} />
 </Routes>
   </BrowserRouter>
 );

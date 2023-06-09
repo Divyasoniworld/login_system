@@ -51,10 +51,8 @@ function Signup() {
           if (response.data.massage) {
                 setError(response.data.massage)
                 if (response.data.code == 1) {
-                  navigate('/login')
+                  navigate('/email_verify')
                 }
-              } else {
-                navigate('/login')
               }
         })
         .catch((error) => {

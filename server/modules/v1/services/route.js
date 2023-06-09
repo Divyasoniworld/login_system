@@ -24,11 +24,11 @@ var storage = multer.diskStorage({
 
 router.post('/createpost',postupload,(req,res)=>{
 
-    var request = req.body;
+    // var request = req.body;
     //  middleware.decryption(req.body,(request)=>{
         var user_id = req.user_id;
         var request = req.body
-        
+        console.log("requesttttt",req.file);
             Auth.addpost(request,req,user_id,(code,message,data) => {
                 middleware.sendResponse(req, res, code, message ,data)
             })

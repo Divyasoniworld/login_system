@@ -265,13 +265,17 @@ function UserProfile() {
                         <button id='follow' className='btn btn-secondary rounded-pill' onClick={sendRequest}>{r.status == 'Pending' ? 'Requested' : 'Following'}</button>
                       </div>
                     )
-                  }) : <button id='follow' className='btn btn-secondary rounded-pill' onClick={sendRequest}>Follow</button>}
+                  }) : <button id='follow' className='btn btn-secondary rounded-pill' onClick={sendRequest}>Follow</button> }
 
                 </li>
                 <li>
+                {reqData.length > 0 ? reqData.map((r,index)=>{
+                  return(
                   <div class="d-flex gap-2">
-                  <button id='message' className='btn btn-secondary rounded-pill' onClick={()=>{navigate(`/chat/${params.id}`)}}>Message</button>
+                  {r.status == 'Accepted' ? <button id='message' className='btn btn-secondary rounded-pill' onClick={()=>{navigate(`/chat/${params.id}`)}}>Message</button> : ""}
                   </div>
+                  )
+                }) : ''}
                 </li>
               </ul>
             </div>

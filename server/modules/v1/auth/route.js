@@ -105,6 +105,37 @@ router.get('/alluser', (req, res) => {
 
 })
 
+router.post('/resend', (req, res) => {
+
+    
+    // var request = req.body;
+    // middleware.decryption(req.body,(request)=>{
+    // var user_id = req.user_id;
+
+        Auth.ResendEmailOtp(req,(code, message, data) => {
+            middleware.sendResponse(req, res, code, message, data)
+        })
+
+    //  })
+
+})
+
+router.post('/verify', (req, res) => {
+
+    
+    // var request = req.body;
+    // middleware.decryption(req.body,(request)=>{
+    // var user_id = req.user_id;
+
+        Auth.EmailVerify(req,(code, message, data) => {
+            middleware.sendResponse(req, res, code, message, data)
+        })
+
+    //  })
+
+})
+
+
 router.post('/singleuser', (req, res) => {
 
     

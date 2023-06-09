@@ -44,7 +44,6 @@ function Home() {
    }
 
     useEffect(() => {
-        console.log(likeData);
         fetchpost()
     }, [refresh]);
 
